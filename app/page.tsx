@@ -14,11 +14,11 @@ export default function HomePage() {
           ARTERRA matches you with vetted independent artists, working in painting, drawing, portraiture, and more, to create a piece made to your size, budget, and story.
         </p>
         <div className="flex gap-3 flex-wrap">
-          <Link href="/commission" className="bg-ink text-cream px-6 py-3 rounded-lg font-medium hover:bg-blue-deep">
-            Start a Commission
+                    <Link href="/commission" className="bg-ink text-cream px-6 py-3 rounded-lg font-medium hover:bg-blue-deep">
+            Commission a Piece
           </Link>
           <Link href="/join" className="border border-line px-6 py-3 rounded-lg font-medium hover:bg-sand">
-            I&apos;m an artist
+            Register as an Artist
           </Link>
         </div>
       </div>

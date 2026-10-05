@@ -7,23 +7,23 @@ export default function Header() {
         <Link href="/" className="font-display italic font-600 text-xl text-ink">
           ARTERRA
         </Link>
-        <nav className="flex items-center gap-1 flex-wrap">
-          <Link href="/explore" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
+       <nav className="flex items-center gap-1 flex-wrap">
+         <Link href="/explore" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
             Explore
+           </Link>
+         <Link href="/commission" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
+          Commission
+         </Link>
+         <Link href="/join" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
+           Register
           </Link>
-          <Link href="/commission" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
-            Start a Commission
+        <Link href="/mine" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
+          My Commissions
           </Link>
-          <Link href="/join" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
-            Join as an artist
-          </Link>
-          <Link href="/mine" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
-            My commissions
-          </Link>
-          <Link href="/studio" className="text-xs font-medium px-3 py-2 rounded-full text-ink-soft/70 hover:text-ink-soft">
-            Studio
-          </Link>
-        </nav>
+        <Link href="/studio" className="text-xs font-medium px-3 py-2 rounded-full text-ink-soft/70 hover:text-ink-soft">
+         Studio
+        </Link>
+       </nav>
       </div>
     </header>
   );

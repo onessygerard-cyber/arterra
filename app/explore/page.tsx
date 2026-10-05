@@ -8,7 +8,7 @@ export default async function ExplorePage() {
 
   return (
     <main className="max-w-4xl mx-auto mt-16 px-6 pb-16">
-      <h1 className="text-2xl mb-1">Artists on the roster</h1>
+           <h1 className="text-2xl mb-1">Explore Artists</h1>
       <p className="text-ink-soft mb-8">{artists?.length || 0} verified</p>
 
       {(!artists || artists.length === 0) && (

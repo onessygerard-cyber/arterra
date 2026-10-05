@@ -53,7 +53,7 @@ export default function JoinPage() {
 
   return (
     <main className="max-w-lg mx-auto mt-16 px-6 pb-16">
-      <h1 className="text-2xl mb-1">Join as an artist</h1>
+          <h1 className="text-2xl mb-1">Become an Artist</h1>
       <p className="text-ink-soft mb-6">We review every application by hand.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4 bg-card border border-line rounded-xl p-7 shadow-sm">

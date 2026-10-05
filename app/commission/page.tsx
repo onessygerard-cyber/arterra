@@ -42,7 +42,7 @@ export default function CommissionPage() {
 
   return (
     <main className="max-w-lg mx-auto mt-16 px-6 pb-16">
-      <h1 className="text-2xl mb-1">Start a commission</h1>
+            <h1 className="text-2xl mb-1">Request a Commission</h1>
       <p className="text-ink-soft mb-6">Tell us what you&apos;re picturing.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4 bg-card border border-line rounded-xl p-7 shadow-sm">
@@ -93,7 +93,7 @@ export default function CommissionPage() {
 
         <button type="submit" disabled={status === 'saving'}
           className="bg-ink text-cream px-6 py-2.5 rounded-lg font-medium hover:bg-blue-deep disabled:opacity-50">
-          {status === 'saving' ? 'Sending…' : 'Send my brief'}
+                    {status === 'saving' ? 'Sending…' : 'Submit Request'}
         </button>
       </form>
     </main>
