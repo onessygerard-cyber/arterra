@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 
 type Artist = { id: string; name: string; location: string; bio: string; price_range: string; turnaround: string; mediums: string[]; styles: string[]; ships_to: string; };
 type Artwork = { id: string; title: string; description: string; listing_type: string; medium: string; size: string; price: string; image_url: string; status: string; };
@@ -59,14 +60,19 @@ export default function ArtistProfilePage() {
 
   return (
     <main className="max-w-4xl mx-auto mt-16 px-6 pb-20">
-      <div className="flex justify-between items-start gap-4 mb-2">
+           <div className="flex justify-between items-start gap-4 mb-2">
         <div>
           <h1 className="text-3xl mb-1">{artist.name}</h1>
           <p className="text-ink-soft">{artist.location}</p>
         </div>
-        <button onClick={copyLink} className="text-sm border border-line px-3 py-1.5 rounded-full hover:bg-sand whitespace-nowrap">
-          {copied ? 'Copied!' : 'Copy Link'}
-        </button>
+        <div className="flex gap-2">
+          <Link href="/mine" className="text-sm border border-line px-3 py-1.5 rounded-full hover:bg-sand whitespace-nowrap">
+            My Commissions
+          </Link>
+          <button onClick={copyLink} className="text-sm border border-line px-3 py-1.5 rounded-full hover:bg-sand whitespace-nowrap">
+            {copied ? 'Copied!' : 'Copy Link'}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-1.5 my-4">

@@ -17,9 +17,6 @@ export default function Header() {
          <Link href="/join" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
            Register
           </Link>
-        <Link href="/mine" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
-          My Commissions
-          </Link>
         <Link href="/studio" className="text-xs font-medium px-3 py-2 rounded-full text-ink-soft/70 hover:text-ink-soft">
          Studio
         </Link>
