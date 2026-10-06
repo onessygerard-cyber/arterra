@@ -9,6 +9,10 @@ export async function GET() {
     .from('commissions')
     .select('*, briefs(buyer_name, buyer_contact, description), artists(name, contact)')
     .order('updated_at', { ascending: false });
+  const { data: pendingArtworks } = await supabaseAdmin
+    .from('artworks')
+    .select('*, artists(name)')
+    .eq('status', 'pending');
 
-  return NextResponse.json({ newBriefs, pendingArtists, verifiedArtists, commissions });
+  return NextResponse.json({ newBriefs, pendingArtists, verifiedArtists, commissions, pendingArtworks });
 }

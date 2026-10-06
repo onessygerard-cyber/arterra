@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "ARTERRA — Your vision. Made original.",
+    title: "ARTERRA: Your vision. Made original.",
   description: "Commission original art from vetted independent artists.",
 };
 
