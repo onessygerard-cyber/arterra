@@ -9,7 +9,7 @@ type Artist = {
 };
 type Artwork = {
   id: string; title: string; listing_type: string; medium: string; price: string;
-  image_url: string; artist_id: string; artists: { name: string } | null;
+  image_url: string; artist_id: string; status: string; artists: { name: string } | null;
 };
 
 export default function ExplorePage() {
@@ -100,6 +100,9 @@ export default function ExplorePage() {
                   <span className={`absolute top-2 left-2 text-xs font-semibold px-2.5 py-1 rounded-full ${a.listing_type === 'original' ? 'bg-gold text-ink' : 'bg-blue text-cream'}`}>
                     {a.listing_type === 'original' ? 'Original' : 'Print'}
                   </span>
+                  {a.status === 'sold' && (
+                    <span className="absolute top-2 right-2 text-xs font-semibold px-2.5 py-1 rounded-full bg-ink text-cream">Sold</span>
+                  )}
                 </div>
                 <div className="p-4">
                   <p className="font-medium">{a.title}</p>

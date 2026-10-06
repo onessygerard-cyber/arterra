@@ -17,6 +17,11 @@ type Artwork = {
   artists: { name: string } | null;
 };
 
+type Inquiry = {
+  id: string; buyer_name: string; buyer_contact: string; message: string; status: string;
+  artworks: { title: string; artists: { name: string } | null } | null;
+};
+
 const STAGES = ['proposed', 'deposit_paid', 'in_progress', 'review', 'shipped', 'delivered'];
 const STAGE_LABELS: Record<string, string> = {
   proposed: 'Quoted', deposit_paid: 'Deposit paid', in_progress: 'In progress',
@@ -30,6 +35,8 @@ export default function StudioPage() {
   const [verifiedArtists, setVerifiedArtists] = useState<Artist[]>([]);
   const [commissions, setCommissions] = useState<Commission[]>([]);
   const [pendingArtworks, setPendingArtworks] = useState<Artwork[]>([]);
+  const [liveArtworks, setLiveArtworks] = useState<Artwork[]>([]);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [openMatchFor, setOpenMatchFor] = useState<string | null>(null);
   const [matchArtist, setMatchArtist] = useState<Record<string, string>>({});
   const [matchPrice, setMatchPrice] = useState<Record<string, string>>({});
@@ -54,6 +61,8 @@ export default function StudioPage() {
     setVerifiedArtists(data.verifiedArtists || []);
     setCommissions(data.commissions || []);
     setPendingArtworks(data.pendingArtworks || []);
+    setLiveArtworks(data.liveArtworks || []);
+    setInquiries(data.inquiries || []);
   }
 
   async function createCommission(briefId: string) {
@@ -93,7 +102,16 @@ export default function StudioPage() {
     loadData();
   }
 
-  
+  async function markSold(artworkId: string) {
+    const res = await fetch('/api/artworks/update-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ artworkId, status: 'sold' })
+    });
+    if (!res.ok) { alert('Could not update this artwork.'); return; }
+    loadData();
+  }
+
   async function approveArtist(artistId: string) {
     const res = await fetch('/api/artists/update-status', {
       method: 'POST',
@@ -103,6 +121,17 @@ export default function StudioPage() {
     if (!res.ok) { alert('Could not approve this artist.'); return; }
     loadData();
   }
+
+  async function updateInquiryStatus(inquiryId: string, status: string) {
+    const res = await fetch('/api/artwork-inquiries/update-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inquiryId, status })
+    });
+    if (!res.ok) { alert('Could not update this inquiry.'); return; }
+    loadData();
+  }
+
 
   const inputClass = "w-full border border-line rounded-lg px-3 py-2 text-sm bg-cream focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue";
 
@@ -207,6 +236,63 @@ export default function StudioPage() {
                   className="mt-3 w-full bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-deep">
                   Approve
                 </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      
+      <section className="mb-14">
+        <h2 className="text-lg mb-4">Live artwork <span className="font-mono text-sm text-ink-soft font-normal">({liveArtworks.length})</span></h2>
+        {liveArtworks.length === 0 && <p className="text-ink-soft text-sm">Nothing live yet.</p>}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {liveArtworks.map(a => (
+            <div key={a.id} className="bg-card border border-line rounded-xl overflow-hidden shadow-sm">
+              {a.image_url && <img src={a.image_url} alt={a.title} className="w-full h-40 object-cover" />}
+              <div className="p-4">
+                <div className="flex justify-between items-start gap-2">
+                  <div>
+                    <p className="font-medium">{a.title}</p>
+                    <p className="text-xs text-ink-soft">{a.artists?.name} · {a.listing_type === 'original' ? 'Original' : 'Print'}</p>
+                  </div>
+                  <span className="text-xs font-mono text-ink-soft whitespace-nowrap">{a.price}</span>
+                </div>
+                {a.status === 'sold' ? (
+                  <span className="mt-3 inline-block text-xs font-semibold px-2.5 py-1 rounded-full bg-ink text-cream">Sold</span>
+                ) : (
+                  <button onClick={() => markSold(a.id)}
+                    className="mt-3 w-full border border-line px-4 py-2 rounded-lg text-sm font-medium hover:bg-sand">
+                    Mark as Sold
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mb-14">
+        <h2 className="text-lg mb-4">Inquiries <span className="font-mono text-sm text-ink-soft font-normal">({inquiries.length})</span></h2>
+        {inquiries.length === 0 && <p className="text-ink-soft text-sm">No inquiries yet.</p>}
+        <div className="space-y-3">
+          {inquiries.map(i => (
+            <div key={i.id} className="bg-card border border-line rounded-xl p-5 shadow-sm">
+              <div className="flex justify-between items-start gap-3">
+                <div>
+                  <p className="font-medium">{i.buyer_name}</p>
+                  <p className="text-sm text-ink-soft mb-2">
+                    On &ldquo;{i.artworks?.title}&rdquo; by {i.artworks?.artists?.name}
+                  </p>
+                  {i.message && <p className="text-sm mb-2">{i.message}</p>}
+                  <p className="text-xs text-ink-soft/70 font-mono">{i.buyer_contact}</p>
+                </div>
+                <select className="border border-line rounded-lg px-2.5 py-1.5 text-sm font-mono bg-cream"
+                  value={i.status}
+                  onChange={e => updateInquiryStatus(i.id, e.target.value)}>
+                  <option value="new">New</option>
+                  <option value="contacted">Contacted</option>
+                  <option value="converted">Converted</option>
+                </select>
               </div>
             </div>
           ))}

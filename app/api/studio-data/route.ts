@@ -13,6 +13,14 @@ export async function GET() {
     .from('artworks')
     .select('*, artists(name)')
     .eq('status', 'pending');
+  const { data: liveArtworks } = await supabaseAdmin
+    .from('artworks')
+    .select('*, artists(name)')
+    .in('status', ['approved', 'sold']);
+  const { data: inquiries } = await supabaseAdmin
+    .from('artwork_inquiries')
+    .select('*, artworks(title, artists(name))')
+    .order('created_at', { ascending: false });
 
-  return NextResponse.json({ newBriefs, pendingArtists, verifiedArtists, commissions, pendingArtworks });
+    return NextResponse.json({ newBriefs, pendingArtists, verifiedArtists, commissions, pendingArtworks, inquiries, liveArtworks });
 }
