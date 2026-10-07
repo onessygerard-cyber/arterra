@@ -8,19 +8,22 @@ export default function Header() {
           ARTERRA
         </Link>
        <nav className="flex items-center gap-1 flex-wrap">
-         <Link href="/explore" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
-            Explore
-           </Link>
-         <Link href="/commission" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
-          Commission
-         </Link>
-         <Link href="/join" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
-           Register
-          </Link>
-        <Link href="/studio" className="text-xs font-medium px-3 py-2 rounded-full text-ink-soft/70 hover:text-ink-soft">
-         Studio
-        </Link>
-       </nav>
+  <Link href="/explore" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
+    Explore
+  </Link>
+  <Link href="/commission" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
+    Commission
+  </Link>
+  <Link href="/join" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
+    Register
+  </Link>
+  <Link href="/artist-login" className="text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink">
+    Artist Login
+  </Link>
+  <Link href="/studio" className="text-xs font-medium px-3 py-2 rounded-full text-ink-soft/70 hover:text-ink-soft">
+    Studio
+  </Link>
+</nav>
       </div>
     </header>
   );
