@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
 type Artist = { id: string; name: string; location: string; bio: string; price_range: string; turnaround: string; mediums: string[]; styles: string[]; ships_to: string; };
-type Artwork = { id: string; title: string; description: string; listing_type: string; medium: string; size: string; price: string; image_url: string; status: string; };
+type Artwork = { id: string; title: string; description: string; listing_type: string; medium: string; size: string; price: string; image_url: string; status: string; year: string; framed_status: string; style: string; };
 
 export default function ArtistProfilePage() {
   const params = useParams();
@@ -110,8 +110,8 @@ export default function ArtistProfilePage() {
               )}
             </div>
             <div className="p-4">
-              <p className="font-medium">{a.title}</p>
-              <p className="text-xs text-ink-soft mb-2">{a.medium} · {a.size}</p>
+              <p className="font-medium">{a.title}{a.year ? `, ${a.year}` : ''}</p>
+              <p className="text-xs text-ink-soft mb-2">{a.medium} · {a.size} {a.framed_status && `· ${a.framed_status === 'framed' ? 'Framed' : a.framed_status === 'stretched' ? 'Stretched canvas' : 'Unframed'}`}</p>
               <div className="flex justify-between items-center">
                 <span className="font-mono text-sm">{a.price}</span>
                 {a.status !== 'sold' && (

@@ -6,7 +6,7 @@ export async function POST(request: Request) {
 
   const { data, error } = await supabaseAdmin
     .from('artworks')
-    .insert({
+        .insert({
       artist_id: body.artistId,
       title: body.title,
       description: body.description,
@@ -15,6 +15,9 @@ export async function POST(request: Request) {
       size: body.size,
       price: body.price,
       image_url: body.imageUrl,
+      year: body.year,
+      framed_status: body.framedStatus,
+      style: body.style,
       status: 'pending'
     })
     .select();

@@ -9,7 +9,7 @@ export default function SubmitArtworkPage() {
   const [lookupStatus, setLookupStatus] = useState<'idle' | 'checking' | 'found' | 'not-verified' | 'not-found'>('idle');
   const [artist, setArtist] = useState<Artist | null>(null);
 
-  const [form, setForm] = useState({ title: '', description: '', listingType: 'original', medium: '', size: '', price: '' });
+  const [form, setForm] = useState({ title: '', description: '', listingType: 'original', medium: '', size: '', price: '', year: '', framedStatus: '', style: '' });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'saving' | 'done' | 'error'>('idle');
@@ -104,12 +104,27 @@ export default function SubmitArtworkPage() {
           <textarea placeholder="Description" value={form.description}
             onChange={e => setForm({ ...form, description: e.target.value })} className={inputClass} rows={3} />
 
-          <div className="flex gap-3">
+                    <div className="flex gap-3">
             <input placeholder="Medium, e.g. Oil on canvas" value={form.medium}
               onChange={e => setForm({ ...form, medium: e.target.value })} className={inputClass} />
             <input placeholder="Size, e.g. 60 × 80 cm" value={form.size}
               onChange={e => setForm({ ...form, size: e.target.value })} className={inputClass} />
           </div>
+
+          <div className="flex gap-3">
+            <input placeholder="Year, e.g. 2025" value={form.year}
+              onChange={e => setForm({ ...form, year: e.target.value })} className={inputClass} />
+            <input placeholder="Style, e.g. Abstract, Portraiture" value={form.style}
+              onChange={e => setForm({ ...form, style: e.target.value })} className={inputClass} />
+          </div>
+
+          <select value={form.framedStatus}
+            onChange={e => setForm({ ...form, framedStatus: e.target.value })} className={inputClass}>
+            <option value="">Framing status</option>
+            <option value="unframed">Unframed</option>
+            <option value="stretched">Stretched Canvas</option>
+            <option value="framed">Framed, Ready to Hang</option>
+          </select>
 
           <input placeholder="Price, e.g. $450" value={form.price}
             onChange={e => setForm({ ...form, price: e.target.value })} className={inputClass} />
