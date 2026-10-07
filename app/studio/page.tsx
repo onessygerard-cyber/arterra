@@ -13,7 +13,7 @@ type Commission = {
 };
 type Artwork = {
   id: string; title: string; description: string; listing_type: string;
-  medium: string; size: string; price: string; image_url: string;
+  medium: string; size: string; price: string; image_url: string; status: string;
   artists: { name: string } | null;
 };
 
