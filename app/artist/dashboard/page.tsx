@@ -95,7 +95,16 @@ export default function ArtistDashboard() {
   };
 
   if (checking) return <main className="max-w-4xl mx-auto mt-16 px-6 text-ink-soft">Loading…</main>;
-  if (error) return <main className="max-w-4xl mx-auto mt-16 px-6"><p className="text-red-600">{error}</p></main>;
+  if (error) {
+    return (
+      <main className="max-w-4xl mx-auto mt-16 px-6">
+        <p className="text-red-600 mb-2">{error}</p>
+        <p className="text-ink-soft text-sm">
+          Not registered as an artist yet? <Link href="/join" className="underline text-blue-deep">Apply here</Link>.
+        </p>
+      </main>
+    );
+  }
 
   return (
     <main className="max-w-4xl mx-auto mt-16 px-6 pb-20">

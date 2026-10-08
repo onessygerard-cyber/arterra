@@ -13,6 +13,7 @@ export default function CommissionPage() {
   });
   const [status, setStatus] = useState<'idle' | 'saving' | 'done' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const [trackToken, setTrackToken] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,16 +27,22 @@ export default function CommissionPage() {
     });
     const data = await res.json();
     if (!res.ok) { setStatus('error'); setErrorMsg(data.error || 'Something went wrong.'); return; }
+    setTrackToken(data.brief.track_token);
     setStatus('done');
   }
 
   const inputClass = "w-full border border-line rounded-lg px-4 py-2.5 bg-card focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue";
 
   if (status === 'done') {
+    const trackUrl = `/track?token=${trackToken}`;
     return (
       <main className="max-w-lg mx-auto mt-16 px-6">
         <h1 className="text-2xl mb-1">Brief received.</h1>
-        <p className="text-ink-soft mt-2">We&apos;ll follow up with a short-list of artists soon.</p>
+        <p className="text-ink-soft mt-2 mb-6">We&apos;ll follow up with a short-list of artists soon.</p>
+        <div className="bg-card border border-line rounded-xl p-6 shadow-sm">
+          <p className="text-sm font-medium mb-2">Bookmark this link to track your request:</p>
+          <a href={trackUrl} className="text-sm text-blue-deep underline break-all">{typeof window !== 'undefined' ? window.location.origin : ''}{trackUrl}</a>
+        </div>
       </main>
     );
   }

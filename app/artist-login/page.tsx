@@ -1,12 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 
 export default function ArtistLoginPage() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  const [checking, setChecking] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    async function checkSession() {
+      const { data } = await supabaseBrowser.auth.getSession();
+      if (data.session) { router.push('/artist/dashboard'); return; }
+      setChecking(false);
+    }
+    checkSession();
+  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -24,6 +37,10 @@ export default function ArtistLoginPage() {
 
   const inputClass = "w-full border border-line rounded-lg px-4 py-2.5 bg-card focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue";
 
+  if (checking) {
+    return <main className="max-w-sm mx-auto mt-24 px-6 text-ink-soft">Checking…</main>;
+  }
+
   if (sent) {
     return (
       <main className="max-w-sm mx-auto mt-24 px-6">
@@ -40,7 +57,12 @@ export default function ArtistLoginPage() {
       <form onSubmit={handleSubmit} className="space-y-3 bg-card border border-line rounded-xl p-6 shadow-sm">
         <input required type="email" placeholder="Email" value={email}
           onChange={e => setEmail(e.target.value)} className={inputClass} />
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {error && (
+          <p className="text-red-600 text-sm">
+            {error} Not registered yet?{' '}
+            <Link href="/join" className="underline">Apply here</Link>.
+          </p>
+        )}
         <button type="submit" className="bg-ink text-cream px-5 py-2.5 rounded-lg font-medium hover:bg-blue-deep w-full">
           Send Login Link
         </button>
