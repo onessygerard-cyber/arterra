@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 const STAGES = ['proposed', 'deposit_paid', 'in_progress', 'review', 'shipped', 'delivered'];
@@ -17,7 +17,7 @@ type Commission = {
 };
 type Brief = { id: string; buyer_name: string; description: string; status: string };
 
-export default function TrackPage() {
+function TrackContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
 
@@ -113,5 +113,13 @@ export default function TrackPage() {
         })}
       </div>
     </main>
+  );
+}
+
+export default function TrackPage() {
+  return (
+    <Suspense fallback={<main className="max-w-2xl mx-auto mt-16 px-6 text-ink-soft">Loading…</main>}>
+      <TrackContent />
+    </Suspense>
   );
 }
