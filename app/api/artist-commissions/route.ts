@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { signReferenceImages } from '@/lib/signed-urls';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -16,10 +17,18 @@ export async function GET(request: Request) {
 
   const { data: commissions, error } = await supabaseAdmin
     .from('commissions')
-    .select('*, briefs(buyer_name, buyer_contact, description), commission_messages(id, from_label, text, created_at)')
+    .select('*, briefs(buyer_name, buyer_contact, description, reference_images), commission_messages(id, from_label, text, created_at)')
     .eq('artist_id', artist.id)
     .order('updated_at', { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ commissions: commissions || [] });
+
+  const withImages = await Promise.all(
+    (commissions || []).map(async (c: { briefs?: { reference_images?: string[] | null } | null }) => ({
+      ...c,
+      reference_urls: await signReferenceImages(c.briefs?.reference_images),
+    }))
+  );
+
+  return NextResponse.json({ commissions: withImages });
 }

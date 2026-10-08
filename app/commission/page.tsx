@@ -4,6 +4,8 @@ import { useState } from 'react';
 
 const MEDIUMS = ['Painting','Drawing','Portrait','Sculpture','Photography','Textile / Fiber art','Ceramics','Mixed media','Not sure yet'];
 const STYLES = ['Abstract','Contemporary realism','Landscape','Still life','Other','Not sure yet'];
+const MAX_IMAGES = 4;
+const MAX_BYTES = 4 * 1024 * 1024;
 
 export default function CommissionPage() {
   const [form, setForm] = useState({
@@ -11,19 +13,54 @@ export default function CommissionPage() {
     medium: MEDIUMS[0], style: STYLES[0], size: '', budget: '',
     deadline: '', location: '', notes: ''
   });
+  const [refFiles, setRefFiles] = useState<File[]>([]);
+  const [refError, setRefError] = useState('');
   const [status, setStatus] = useState<'idle' | 'saving' | 'done' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [trackToken, setTrackToken] = useState('');
+
+  function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    setRefError('');
+    const picked = Array.from(e.target.files || []);
+    const tooBig = picked.find(f => f.size > MAX_BYTES);
+    if (tooBig) {
+      setRefError(`"${tooBig.name}" is over 4 MB. Please choose a smaller image.`);
+      e.target.value = '';
+      return;
+    }
+    const combined = [...refFiles, ...picked];
+    if (combined.length > MAX_IMAGES) setRefError(`You can add up to ${MAX_IMAGES} images.`);
+    setRefFiles(combined.slice(0, MAX_IMAGES));
+    e.target.value = '';
+  }
+
+  function removeFile(index: number) {
+    setRefFiles(refFiles.filter((_, i) => i !== index));
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus('saving');
     setErrorMsg('');
 
+    const referenceImages: string[] = [];
+    for (const file of refFiles) {
+      const upload = new FormData();
+      upload.append('file', file);
+      const upRes = await fetch('/api/upload-reference', { method: 'POST', body: upload });
+      const upData = await upRes.json().catch(() => ({}));
+      if (!upRes.ok) {
+        setStatus('error');
+        setErrorMsg(upData.error || 'An image failed to upload. Please try again.');
+        return;
+      }
+      referenceImages.push(upData.path);
+    }
+
     const res = await fetch('/api/briefs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
+      body: JSON.stringify({ ...form, referenceImages })
     });
     const data = await res.json();
     if (!res.ok) { setStatus('error'); setErrorMsg(data.error || 'Something went wrong.'); return; }
@@ -41,7 +78,9 @@ export default function CommissionPage() {
         <p className="text-ink-soft mt-2 mb-6">We&apos;ll follow up with a short-list of artists soon.</p>
         <div className="bg-card border border-line rounded-xl p-6 shadow-sm">
           <p className="text-sm font-medium mb-2">Bookmark this link to track your request:</p>
-          <a href={trackUrl} className="text-sm text-blue-deep underline break-all">{typeof window !== 'undefined' ? window.location.origin : ''}{trackUrl}</a>
+          <a href={trackUrl} className="text-sm text-blue-deep underline break-all">
+            {typeof window !== 'undefined' ? window.location.origin : ''}{trackUrl}
+          </a>
         </div>
       </main>
     );
@@ -49,7 +88,7 @@ export default function CommissionPage() {
 
   return (
     <main className="max-w-lg mx-auto mt-16 px-6 pb-16">
-            <h1 className="text-2xl mb-1">Request a Commission</h1>
+      <h1 className="text-2xl mb-1">Request a Commission</h1>
       <p className="text-ink-soft mb-6">Tell us what you&apos;re picturing.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4 bg-card border border-line rounded-xl p-7 shadow-sm">
@@ -92,15 +131,39 @@ export default function CommissionPage() {
           onChange={e => setForm({ ...form, location: e.target.value })}
           className={inputClass} />
 
-         <textarea placeholder="Anything else? Colors, mood, or references (optional)" value={form.notes}
+        <textarea placeholder="Anything else? Colors, mood, or references (optional)" value={form.notes}
           onChange={e => setForm({ ...form, notes: e.target.value })}
           className={inputClass} rows={2} />
+
+        <div>
+          <label className="text-sm font-medium block mb-1">
+            Reference images <span className="text-ink-soft font-normal">(optional, up to 4)</span>
+          </label>
+          <p className="text-xs text-ink-soft mb-2">
+            Photos, sketches, or inspiration. Only the ARTERRA team and your matched artist will see these.
+          </p>
+          <input type="file" accept="image/*" multiple onChange={handleFiles}
+            disabled={refFiles.length >= MAX_IMAGES} className="w-full text-sm" />
+          {refError && <p className="text-red-600 text-sm mt-2">{refError}</p>}
+          {refFiles.length > 0 && (
+            <ul className="mt-3 space-y-1">
+              {refFiles.map((f, i) => (
+                <li key={i} className="flex justify-between items-center text-sm bg-sand/60 rounded-lg px-3 py-1.5">
+                  <span className="truncate">{f.name}</span>
+                  <button type="button" onClick={() => removeFile(i)} className="text-ink-soft hover:text-ink ml-3">
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         {errorMsg && <p className="text-red-600 text-sm">{errorMsg}</p>}
 
         <button type="submit" disabled={status === 'saving'}
           className="bg-ink text-cream px-6 py-2.5 rounded-lg font-medium hover:bg-blue-deep disabled:opacity-50">
-                    {status === 'saving' ? 'Sending…' : 'Submit Request'}
+          {status === 'saving' ? 'Sending…' : 'Submit Request'}
         </button>
       </form>
     </main>

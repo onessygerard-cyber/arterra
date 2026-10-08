@@ -1,8 +1,16 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { signReferenceImages } from '@/lib/signed-urls';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const { data: newBriefs } = await supabaseAdmin.from('briefs').select('*').eq('status', 'new');
+  const { data: rawBriefs } = await supabaseAdmin.from('briefs').select('*').eq('status', 'new');
+  const newBriefs = await Promise.all(
+    (rawBriefs || []).map(async (b: { reference_images?: string[] | null }) => ({
+      ...b,
+      reference_urls: await signReferenceImages(b.reference_images),
+    }))
+  );
+
   const { data: pendingArtists } = await supabaseAdmin.from('artists').select('*').eq('status', 'pending');
   const { data: verifiedArtists } = await supabaseAdmin.from('artists').select('*').eq('status', 'verified');
   const { data: commissions } = await supabaseAdmin
@@ -22,5 +30,5 @@ export async function GET() {
     .select('*, artworks(title, artists(name))')
     .order('created_at', { ascending: false });
 
-    return NextResponse.json({ newBriefs, pendingArtists, verifiedArtists, commissions, pendingArtworks, inquiries, liveArtworks });
+  return NextResponse.json({ newBriefs, pendingArtists, verifiedArtists, commissions, pendingArtworks, liveArtworks, inquiries });
 }

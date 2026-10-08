@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 
 type Artist = { id: string; name: string; contact: string; mediums: string[]; styles: string[]; location: string; price_range: string; turnaround: string; bio: string; portfolio: string; };
-type Brief = { id: string; buyer_name: string; buyer_contact: string; description: string; medium: string; style: string; size: string; budget: string; location: string; };
+type Brief = { id: string; buyer_name: string; buyer_contact: string; description: string; medium: string; style: string; size: string; budget: string; location: string; reference_urls?: string[]; };
 type Commission = {
   id: string; price: string; timeline: string; status: string;
   briefs: { buyer_name: string; buyer_contact: string; description: string } | null;
@@ -155,6 +155,15 @@ export default function StudioPage() {
                   <p className="font-medium">{b.buyer_name}</p>
                   <p className="text-sm text-ink-soft mb-2">{b.medium} · {b.style} · {b.size} · {b.budget} · {b.location}</p>
                   <p className="text-sm">{b.description}</p>
+                  {b.reference_urls && b.reference_urls.length > 0 && (
+                    <div className="flex gap-2 mt-3 flex-wrap">
+                      {b.reference_urls.map((u, i) => (
+                        <a key={i} href={u} target="_blank" rel="noreferrer">
+                          <img src={u} alt={`Reference ${i + 1}`} className="w-16 h-16 object-cover rounded-lg border border-line" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
                   <p className="text-xs text-ink-soft/70 mt-2 font-mono">{b.buyer_contact}</p>
                 </div>
                 <button onClick={() => setOpenMatchFor(openMatchFor === b.id ? null : b.id)}

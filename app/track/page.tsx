@@ -15,7 +15,7 @@ type Commission = {
   artists: { name: string } | null;
   commission_messages: Message[];
 };
-type Brief = { id: string; buyer_name: string; description: string; status: string };
+type Brief = { id: string; buyer_name: string; description: string; status: string; reference_urls?: string[] };
 
 function TrackContent() {
   const searchParams = useSearchParams();
@@ -60,7 +60,18 @@ function TrackContent() {
   return (
     <main className="max-w-2xl mx-auto mt-16 px-6 pb-16">
       <h1 className="text-2xl mb-1">Your Request</h1>
-      <p className="text-ink-soft mb-8">{brief.description}</p>
+      <div className="mb-8">
+        <p className="text-ink-soft mb-3">{brief.description}</p>
+        {brief.reference_urls && brief.reference_urls.length > 0 && (
+          <div className="flex gap-2 flex-wrap">
+            {brief.reference_urls.map((u, i) => (
+              <a key={i} href={u} target="_blank" rel="noreferrer">
+                <img src={u} alt={`Reference ${i + 1}`} className="w-20 h-20 object-cover rounded-lg border border-line" />
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
 
       {commissions.length === 0 && (
         <div className="border border-dashed border-line rounded-xl p-8 text-center text-ink-soft bg-card/50">

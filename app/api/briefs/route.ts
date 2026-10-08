@@ -17,6 +17,9 @@ export async function POST(request: Request) {
       deadline: body.deadline || null,
       location: body.location,
       notes: body.notes,
+      reference_images: Array.isArray(body.referenceImages)
+        ? body.referenceImages.filter((p: unknown) => typeof p === 'string').slice(0, 4)
+        : [],
       status: 'new'
     })
     .select();

@@ -12,6 +12,7 @@ type Commission = {
   id: string; price: string; timeline: string; status: string;
   briefs: { buyer_name: string; buyer_contact: string; description: string } | null;
   commission_messages: Message[];
+  reference_urls?: string[];
 };
 
 const STAGE_LABELS: Record<string, string> = {
@@ -176,6 +177,18 @@ export default function ArtistDashboard() {
                   </span>
                 </div>
                 <p className="text-sm font-mono text-ink-soft mb-4">{c.price} · {c.timeline}</p>
+                {c.reference_urls && c.reference_urls.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-xs font-medium text-ink-soft mb-2">Reference images</p>
+                    <div className="flex gap-2 flex-wrap">
+                      {c.reference_urls.map((u, i) => (
+                        <a key={i} href={u} target="_blank" rel="noreferrer">
+                          <img src={u} alt={`Reference ${i + 1}`} className="w-20 h-20 object-cover rounded-lg border border-line" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="border-t border-line pt-3 space-y-2 max-h-40 overflow-y-auto mb-3">
                   {messages.length === 0 && <p className="text-sm text-ink-soft/70">No messages yet.</p>}

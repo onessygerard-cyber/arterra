@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { signReferenceImages } from '@/lib/signed-urls';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -14,9 +15,11 @@ export async function GET(request: Request) {
 
   const { data: commissions, error } = await supabaseAdmin
     .from('commissions')
-    .select('*, artists(name, contact), commission_messages(id, from_label, text, created_at)')
+    .select('*, artists(name), commission_messages(id, from_label, text, created_at)')
     .eq('brief_id', brief.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ brief, commissions: commissions || [] });
+
+  const reference_urls = await signReferenceImages(brief.reference_images);
+  return NextResponse.json({ brief: { ...brief, reference_urls }, commissions: commissions || [] });
 }
