@@ -37,6 +37,7 @@ export default function StudioPage() {
   const [pendingArtworks, setPendingArtworks] = useState<Artwork[]>([]);
   const [liveArtworks, setLiveArtworks] = useState<Artwork[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [inquiryFilter, setInquiryFilter] = useState<'all' | 'new' | 'contacted' | 'converted'>('all');
   const [openMatchFor, setOpenMatchFor] = useState<string | null>(null);
   const [matchArtist, setMatchArtist] = useState<Record<string, string>>({});
   const [matchPrice, setMatchPrice] = useState<Record<string, string>>({});
@@ -273,9 +274,19 @@ export default function StudioPage() {
 
       <section className="mb-14">
         <h2 className="text-lg mb-4">Inquiries <span className="font-mono text-sm text-ink-soft font-normal">({inquiries.length})</span></h2>
-        {inquiries.length === 0 && <p className="text-ink-soft text-sm">No inquiries yet.</p>}
+        <div className="flex gap-2 mb-4">
+          {(['all', 'new', 'contacted', 'converted'] as const).map(f => (
+            <button key={f} onClick={() => setInquiryFilter(f)}
+              className={`text-sm font-medium px-3 py-1.5 rounded-full ${inquiryFilter === f ? 'bg-ink text-cream' : 'bg-sand text-ink-soft hover:text-ink'}`}>
+              {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ))}
+        </div>
+        {inquiries.filter(i => inquiryFilter === 'all' || i.status === inquiryFilter).length === 0 && (
+          <p className="text-ink-soft text-sm">No inquiries {inquiryFilter === 'all' ? 'yet' : 'with this status'}.</p>
+        )}
         <div className="space-y-3">
-          {inquiries.map(i => (
+          {inquiries.filter(i => inquiryFilter === 'all' || i.status === inquiryFilter).map(i => (
             <div key={i.id} className="bg-card border border-line rounded-xl p-5 shadow-sm">
               <div className="flex justify-between items-start gap-3">
                 <div>
