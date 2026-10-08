@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
   const { data: commissions, error } = await supabaseAdmin
     .from('commissions')
-    .select('*, briefs(buyer_name, buyer_contact, description), artists(name, contact), commission_messages(id, from_label, text, created_at)')
+    .select('*, briefs(buyer_name, description), artists(name), commission_messages(id, from_label, text, created_at)')
     .or(conditions.join(','));
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
