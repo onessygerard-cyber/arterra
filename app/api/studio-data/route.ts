@@ -15,7 +15,7 @@ export async function GET() {
   const { data: verifiedArtists } = await supabaseAdmin.from('artists').select('*').eq('status', 'verified');
   const { data: commissions } = await supabaseAdmin
     .from('commissions')
-    .select('*, briefs(buyer_name, buyer_contact, description), artists(name, contact)')
+    .select('*, briefs(buyer_name, buyer_contact, description, track_token), artists(name, contact)')
     .order('updated_at', { ascending: false });
   const { data: pendingArtworks } = await supabaseAdmin
     .from('artworks')

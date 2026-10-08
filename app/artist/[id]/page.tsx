@@ -66,9 +66,7 @@ export default function ArtistProfilePage() {
           <p className="text-ink-soft">{artist.location}</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/mine" className="text-sm border border-line px-3 py-1.5 rounded-full hover:bg-sand whitespace-nowrap">
-            My Commissions
-          </Link>
+
           <button onClick={copyLink} className="text-sm border border-line px-3 py-1.5 rounded-full hover:bg-sand whitespace-nowrap">
             {copied ? 'Copied!' : 'Copy Link'}
           </button>

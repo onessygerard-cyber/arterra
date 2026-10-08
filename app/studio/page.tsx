@@ -8,7 +8,7 @@ type Artist = { id: string; name: string; contact: string; mediums: string[]; st
 type Brief = { id: string; buyer_name: string; buyer_contact: string; description: string; medium: string; style: string; size: string; budget: string; location: string; reference_urls?: string[]; };
 type Commission = {
   id: string; price: string; timeline: string; status: string;
-  briefs: { buyer_name: string; buyer_contact: string; description: string } | null;
+  briefs: { buyer_name: string; buyer_contact: string; description: string; track_token?: string } | null;
   artists: { name: string; contact: string } | null;
 };
 type Artwork = {
@@ -332,6 +332,16 @@ export default function StudioPage() {
                   <p className="text-xs text-ink-soft/70 font-mono mt-1">
                     {c.briefs?.buyer_contact} {c.artists?.contact ? '· ' + c.artists.contact : ''}
                   </p>
+                  {c.briefs?.track_token && (
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/track?token=${c.briefs?.track_token}`);
+                        alert('Tracking link copied.');
+                      }}
+                      className="mt-2 text-xs border border-line px-2.5 py-1 rounded-full hover:bg-sand">
+                      Copy tracking link
+                    </button>
+                  )}
                 </div>
                 <select className="border border-line rounded-lg px-2.5 py-1.5 text-sm font-mono bg-cream"
                   value={c.status}
