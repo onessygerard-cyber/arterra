@@ -11,6 +11,9 @@
   --color-blue-deep: #1F3557;
   --color-gold: #C08A28;
   --color-gold-deep: #93691C;
+  --color-badge: #E6D0AC;
+  --color-badge-ink: #4A3B2C;
+  --color-field: #8A8175;
 
   --font-display: "Fraunces", Georgia, serif;
   --font-sans: "Inter", system-ui, sans-serif;
@@ -26,4 +29,11 @@ body {
 h1, h2, h3 {
   font-family: var(--font-display);
   font-weight: 480;
+}
+input, select, textarea {
+  border-color: var(--color-field);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-blue);
 }
