@@ -91,6 +91,20 @@ export default function CommissionPage() {
       <h1 className="text-2xl mb-1">Request a Commission</h1>
       <p className="text-ink-soft mb-6">Tell us what you&apos;re picturing.</p>
 
+      <ol className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        {[
+          ['01', 'Tell us what you want', 'Add your idea, budget, deadline and references.'],
+          ['02', 'We match you', 'A verified artist is matched, with a quote and timeline.'],
+          ['03', 'Follow along', 'Track progress and message your artist.'],
+        ].map(([num, title, body]) => (
+          <li key={num} className="border-t-2 border-line pt-3">
+            <span className="font-mono text-xs text-gold-deep block">{num}</span>
+            <span className="text-sm font-medium block mt-1 mb-1">{title}</span>
+            <span className="text-xs text-ink-soft block">{body}</span>
+          </li>
+        ))}
+      </ol>
+
       <form onSubmit={handleSubmit} className="space-y-4 bg-card border border-line rounded-xl p-7 shadow-sm">
         <input required placeholder="Your name" value={form.buyerName}
           onChange={e => setForm({ ...form, buyerName: e.target.value })}

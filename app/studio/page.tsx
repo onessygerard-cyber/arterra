@@ -142,7 +142,23 @@ export default function StudioPage() {
 
   return (
     <main className="max-w-4xl mx-auto mt-16 px-6 pb-20">
-      <h1 className="text-2xl mb-10">Studio</h1>
+      <h1 className="text-2xl mb-6">Studio</h1>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-12">
+        {[
+          { label: 'New briefs', value: newBriefs.length, attention: true },
+          { label: 'Artist applications', value: pendingArtists.length, attention: true },
+          { label: 'Artwork submissions', value: pendingArtworks.length, attention: true },
+          { label: 'New inquiries', value: inquiries.filter(i => i.status === 'new').length, attention: true },
+          { label: 'Live artworks', value: liveArtworks.length, attention: false },
+          { label: 'Active commissions', value: commissions.filter(c => c.status !== 'delivered').length, attention: false },
+        ].map(s => (
+          <div key={s.label} className="bg-card border border-line rounded-xl px-4 py-3 shadow-sm">
+            <p className={`font-display text-2xl ${s.attention && s.value > 0 ? 'text-gold-deep' : 'text-ink'}`}>{s.value}</p>
+            <p className="text-xs text-ink-soft">{s.label}</p>
+          </div>
+        ))}
+      </div>
 
       <section className="mb-14">
         <h2 className="text-lg mb-4">New briefs <span className="font-mono text-sm text-ink-soft font-normal">({newBriefs.length})</span></h2>
