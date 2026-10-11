@@ -122,7 +122,7 @@ export default function ArtistDashboard() {
       <section className="mb-14">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg">My Artworks <span className="font-mono text-sm text-ink-soft font-normal">({artworks.length})</span></h2>
-          <Link href="/submit-artwork" className="bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-deep">
+          <Link href="/submit-artwork" className="bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-deep">
             Add New Artwork
           </Link>
         </div>
@@ -207,7 +207,7 @@ export default function ArtistDashboard() {
                     onKeyDown={e => e.key === 'Enter' && sendMessage(c.id)}
                     className="flex-1 border border-line rounded-lg px-3 py-2 text-sm bg-cream focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue" />
                   <button onClick={() => sendMessage(c.id)}
-                    className="bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-deep">
+                    className="bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-deep">
                     Send
                   </button>
                 </div>

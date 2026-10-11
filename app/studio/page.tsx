@@ -207,7 +207,7 @@ export default function StudioPage() {
                         value={matchTimeline[b.id] || ''}
                         onChange={e => setMatchTimeline({ ...matchTimeline, [b.id]: e.target.value })} />
                       <button onClick={() => createCommission(b.id)}
-                        className="bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-deep">
+                        className="bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-deep">
                         Create commission
                       </button>
                     </>
@@ -233,7 +233,7 @@ export default function StudioPage() {
                   <p className="text-xs text-ink-soft/70 font-mono">{a.contact}</p>
                 </div>
                 <button onClick={() => approveArtist(a.id)}
-                  className="bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-deep whitespace-nowrap">
+                  className="bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-deep whitespace-nowrap">
                   Approve
                 </button>
               </div>
@@ -259,7 +259,7 @@ export default function StudioPage() {
                 </div>
                 <p className="text-sm text-ink-soft mt-2">{a.medium} · {a.size}</p>
                 <button onClick={() => approveArtwork(a.id)}
-                  className="mt-3 w-full bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-deep">
+                  className="mt-3 w-full bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-deep">
                   Approve
                 </button>
               </div>

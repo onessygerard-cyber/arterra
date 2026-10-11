@@ -164,7 +164,7 @@ function TrackContent() {
                   onKeyDown={e => e.key === 'Enter' && sendMessage(c.id)}
                   className="flex-1 min-h-11 border border-line rounded-lg px-3 py-2 text-sm bg-cream focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue" />
                 <button onClick={() => sendMessage(c.id)}
-                  className="min-h-11 bg-ink text-cream px-4 rounded-lg text-sm font-medium hover:bg-blue-deep">
+                  className="min-h-11 bg-ink text-cream px-4 rounded-lg text-sm font-medium hover:bg-brand-deep">
                   Send
                 </button>
               </div>

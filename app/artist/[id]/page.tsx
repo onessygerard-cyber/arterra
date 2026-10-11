@@ -213,7 +213,7 @@ export default function ArtistProfilePage() {
                 <span className="font-mono text-sm">{a.price}</span>
                 {a.status !== 'sold' && (
                   <button onClick={() => openInquiry(a)}
-                    className="min-h-11 bg-ink text-cream px-4 rounded-lg text-sm font-medium hover:bg-blue-deep">
+                    className="min-h-11 bg-ink text-cream px-4 rounded-lg text-sm font-medium hover:bg-brand-deep">
                     Inquire
                   </button>
                 )}
@@ -274,7 +274,7 @@ export default function ArtistProfilePage() {
                 {inquiryError && <p className="text-red-600 text-sm">{inquiryError}</p>}
                 <div className="flex gap-2">
                   <button type="submit" disabled={inquirySending}
-                    className="flex-1 min-h-11 bg-ink text-cream px-4 rounded-lg font-medium hover:bg-blue-deep disabled:opacity-50">
+                    className="flex-1 min-h-11 bg-ink text-cream px-4 rounded-lg font-medium hover:bg-brand-deep disabled:opacity-50">
                     {inquirySending ? 'Sending…' : 'Send Inquiry'}
                   </button>
                   <button type="button" onClick={() => setActiveArtwork(null)}

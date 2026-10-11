@@ -76,7 +76,7 @@ export default function SubmitArtworkPage() {
           <input required placeholder="Email or WhatsApp you registered with" value={contact}
             onChange={e => setContact(e.target.value)} className={inputClass} />
           <button type="submit" disabled={lookupStatus === 'checking'}
-            className="bg-ink text-cream px-5 py-2.5 rounded-lg font-medium hover:bg-blue-deep disabled:opacity-50">
+            className="bg-ink text-cream px-5 py-2.5 rounded-lg font-medium hover:bg-brand-deep disabled:opacity-50">
             {lookupStatus === 'checking' ? 'Checking…' : 'Continue'}
           </button>
           {lookupStatus === 'not-found' && <p className="text-red-600 text-sm">We couldn&apos;t find that contact. Have you registered as an artist yet?</p>}
@@ -139,7 +139,7 @@ export default function SubmitArtworkPage() {
           {errorMsg && <p className="text-red-600 text-sm">{errorMsg}</p>}
 
           <button type="submit" disabled={status === 'saving'}
-            className="bg-ink text-cream px-6 py-2.5 rounded-lg font-medium hover:bg-blue-deep disabled:opacity-50">
+            className="bg-ink text-cream px-6 py-2.5 rounded-lg font-medium hover:bg-brand-deep disabled:opacity-50">
             {status === 'saving' ? 'Uploading…' : 'Submit Artwork'}
           </button>
         </form>

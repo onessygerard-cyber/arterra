@@ -63,7 +63,7 @@ export default function ArtistLoginPage() {
             <Link href="/join" className="underline">Apply here</Link>.
           </p>
         )}
-        <button type="submit" className="bg-ink text-cream px-5 py-2.5 rounded-lg font-medium hover:bg-blue-deep w-full">
+        <button type="submit" className="bg-ink text-cream px-5 py-2.5 rounded-lg font-medium hover:bg-brand-deep w-full">
           Send Login Link
         </button>
       </form>

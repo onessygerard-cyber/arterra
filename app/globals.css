@@ -3,16 +3,18 @@
 @theme {
   --color-cream: #F1ECE2;
   --color-sand: #E7DFCE;
-  --color-ink: #2B2420;
+  --color-ink: #2E1416;
   --color-ink-soft: #5B5147;
   --color-line: #D9CFBC;
   --color-card: #FBF9F3;
   --color-blue: #2C4A7C;
-  --color-blue-deep: #1F3557;
-  --color-gold: #C08A28;
-  --color-gold-deep: #93691C;
-  --color-badge: #E6D0AC;
-  --color-badge-ink: #4A3B2C;
+  --color-blue-deep: #263554;
+  --color-gold: #FBCD0D;
+  --color-gold-deep: #7A5200;
+  --color-brand: #A9221F;
+  --color-brand-deep: #861B18;
+  --color-badge: #FBCD0D;
+  --color-badge-ink: #2E1416;
   --color-field: #8A8175;
 
   --font-display: "Fraunces", Georgia, serif;
@@ -30,6 +32,7 @@ h1, h2, h3 {
   font-family: var(--font-display);
   font-weight: 480;
 }
+
 input, select, textarea {
   border-color: var(--color-field);
 }

@@ -8,13 +8,13 @@ export default function HomePage() {
           Now onboarding artists
         </p>
         <h1 className="text-4xl md:text-5xl leading-tight mb-5">
-          Your vision.<br /><em className="text-blue not-italic font-display italic">Made original.</em>
+          Your vision.<br /><em className="text-brand not-italic font-display italic">Made original.</em>
         </h1>
         <p className="text-ink-soft text-lg mb-8 max-w-prose">
           ARTERRA matches you with vetted independent artists, working in painting, drawing, portraiture, and more, to create a piece made to your size, budget, and story.
         </p>
         <div className="flex gap-3 flex-wrap">
-                    <Link href="/commission" className="bg-ink text-cream px-6 py-3 rounded-lg font-medium hover:bg-blue-deep">
+                    <Link href="/commission" className="bg-brand text-cream px-6 py-3 rounded-lg font-medium hover:bg-brand-deep">
             Commission a Piece
           </Link>
           <Link href="/join" className="border border-line px-6 py-3 rounded-lg font-medium hover:bg-sand">

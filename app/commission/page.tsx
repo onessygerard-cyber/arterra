@@ -176,7 +176,7 @@ export default function CommissionPage() {
         {errorMsg && <p className="text-red-600 text-sm">{errorMsg}</p>}
 
         <button type="submit" disabled={status === 'saving'}
-          className="bg-ink text-cream px-6 py-2.5 rounded-lg font-medium hover:bg-blue-deep disabled:opacity-50">
+          className="bg-brand text-cream px-6 py-2.5 rounded-lg font-medium hover:bg-brand-deep disabled:opacity-50">
           {status === 'saving' ? 'Sending…' : 'Submit Request'}
         </button>
       </form>

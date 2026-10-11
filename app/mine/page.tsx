@@ -23,7 +23,7 @@ export default function MyCommissionsRetiredPage() {
             Your commissions and messages are on your dashboard.
           </p>
           <Link href="/artist-login"
-            className="inline-block bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-deep">
+            className="inline-block bg-ink text-cream px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-deep">
             Artist Login
           </Link>
         </div>

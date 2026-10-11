@@ -41,7 +41,7 @@ export default function StudioLogin() {
         </div>
 
         {error && <p className="text-red-600 text-sm">{error}</p>}
-        <button type="submit" className="bg-ink text-cream px-5 py-2.5 rounded-lg font-medium hover:bg-blue-deep w-full">
+        <button type="submit" className="bg-ink text-cream px-5 py-2.5 rounded-lg font-medium hover:bg-brand-deep w-full">
           Log in
         </button>
       </form>
