@@ -7,7 +7,11 @@ export async function GET(request: Request) {
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
   const { data: artist, error: artistError } = await supabaseAdmin
-    .from('artists').select('*').eq('id', id).eq('status', 'verified').maybeSingle();
+    .from('artists')
+    .select('id, name, location, mediums, styles, bio, price_range, turnaround, ships_to')
+    .eq('id', id)
+    .eq('status', 'verified')
+    .maybeSingle();
 
   if (artistError) return NextResponse.json({ error: artistError.message }, { status: 500 });
   if (!artist) return NextResponse.json({ error: 'Artist not found' }, { status: 404 });

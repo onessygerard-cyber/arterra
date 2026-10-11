@@ -1,8 +1,13 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { signReferenceImages } from '@/lib/signed-urls';
+import { requireAdmin } from '@/lib/require-admin';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: Request) {
+  if (!(await requireAdmin(request))) {
+    return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
+  }
+
   const { data: rawBriefs } = await supabaseAdmin.from('briefs').select('*').eq('status', 'new');
   const newBriefs = await Promise.all(
     (rawBriefs || []).map(async (b: { reference_images?: string[] | null }) => ({

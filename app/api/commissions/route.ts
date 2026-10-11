@@ -1,7 +1,11 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { requireAdmin } from '@/lib/require-admin';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
+  if (!(await requireAdmin(request))) {
+    return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
+  }
   const body = await request.json();
 
   const { data: commission, error: commError } = await supabaseAdmin

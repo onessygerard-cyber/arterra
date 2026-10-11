@@ -54,8 +54,20 @@ export default function StudioPage() {
     init();
   }, [router]);
 
+  async function authFetch(url: string, init: RequestInit = {}) {
+    const { data } = await supabaseBrowser.auth.getSession();
+    const headers = new Headers(init.headers);
+    headers.set('Authorization', `Bearer ${data.session?.access_token ?? ''}`);
+    return fetch(url, { ...init, headers });
+  }
+
   async function loadData() {
-    const res = await fetch('/api/studio-data');
+    const res = await authFetch('/api/studio-data');
+    if (res.status === 401) {
+      await supabaseBrowser.auth.signOut();
+      router.push('/studio/login');
+      return;
+    }
     const data = await res.json();
     setNewBriefs(data.newBriefs || []);
     setPendingArtists(data.pendingArtists || []);
@@ -72,7 +84,7 @@ export default function StudioPage() {
     const timeline = matchTimeline[briefId];
     if (!artistId || !price || !timeline) { alert('Pick an artist and fill in price and timeline.'); return; }
 
-    const res = await fetch('/api/commissions', {
+    const res = await authFetch('/api/commissions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ briefId, artistId, price, timeline })
@@ -84,7 +96,7 @@ export default function StudioPage() {
   }
 
   async function updateStatus(commissionId: string, status: string) {
-    const res = await fetch('/api/commissions/update-status', {
+    const res = await authFetch('/api/commissions/update-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ commissionId, status })
@@ -94,7 +106,7 @@ export default function StudioPage() {
   }
 
   async function approveArtwork(artworkId: string) {
-    const res = await fetch('/api/artworks/update-status', {
+    const res = await authFetch('/api/artworks/update-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ artworkId, status: 'approved' })
@@ -104,7 +116,7 @@ export default function StudioPage() {
   }
 
   async function markSold(artworkId: string) {
-    const res = await fetch('/api/artworks/update-status', {
+    const res = await authFetch('/api/artworks/update-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ artworkId, status: 'sold' })
@@ -114,7 +126,7 @@ export default function StudioPage() {
   }
 
   async function approveArtist(artistId: string) {
-    const res = await fetch('/api/artists/update-status', {
+    const res = await authFetch('/api/artists/update-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ artistId, status: 'verified' })
@@ -124,7 +136,7 @@ export default function StudioPage() {
   }
 
   async function updateInquiryStatus(inquiryId: string, status: string) {
-    const res = await fetch('/api/artwork-inquiries/update-status', {
+    const res = await authFetch('/api/artwork-inquiries/update-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ inquiryId, status })

@@ -17,7 +17,7 @@ export async function GET(request: Request) {
 
   const { data: commissions, error } = await supabaseAdmin
     .from('commissions')
-    .select('*, briefs(buyer_name, buyer_contact, description, reference_images), commission_messages(id, from_label, text, created_at)')
+    .select('*, briefs(buyer_name, description, reference_images), commission_messages(id, from_label, text, created_at)')
     .eq('artist_id', artist.id)
     .order('updated_at', { ascending: false });
 
