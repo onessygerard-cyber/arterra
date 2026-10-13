@@ -37,11 +37,6 @@ export default function ArtistDashboard() {
       const tok = data.session.access_token;
       setToken(tok);
 
-      await fetch('/api/artist-link', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${tok}` },
-      });
-
       const res = await fetch('/api/my-artworks', { headers: { Authorization: `Bearer ${tok}` } });
       const body = await res.json();
       if (!res.ok) { setError(body.error || 'Could not load your dashboard.'); setChecking(false); return; }
@@ -114,9 +109,14 @@ export default function ArtistDashboard() {
           <h1 className="text-2xl mb-1">Welcome, {artist?.name}</h1>
           <p className="text-ink-soft text-sm">Manage your listed artwork and commissions.</p>
         </div>
-        <button onClick={logout} className="text-sm border border-line px-3 py-1.5 rounded-full hover:bg-sand">
-          Log Out
-        </button>
+        <div className="flex gap-2">
+          <Link href="/artist/password" className="min-h-11 inline-flex items-center text-sm border border-line px-4 rounded-full hover:bg-sand">
+            Change Password
+          </Link>
+          <button onClick={logout} className="min-h-11 text-sm border border-line px-4 rounded-full hover:bg-sand">
+            Log Out
+          </button>
+        </div>
       </div>
 
       <section className="mb-14">
