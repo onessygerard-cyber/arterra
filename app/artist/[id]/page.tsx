@@ -15,18 +15,20 @@ type Artwork = {
 };
 type Filter = 'all' | 'original' | 'print';
 
-const pillClass = (active: boolean) =>
-  `inline-flex items-center min-h-11 text-sm font-medium px-4 rounded-full border transition-colors ${
-    active
-      ? 'bg-blue-deep text-cream border-blue-deep'
-      : 'bg-card text-ink-soft border-line hover:bg-sand hover:text-ink'
+const tabClass = (active: boolean) =>
+  `min-h-11 px-1 text-sm font-medium border-b-2 -mb-px transition-colors ${
+    active ? 'border-blue-deep text-ink' : 'border-transparent text-ink-soft hover:text-ink'
   }`;
 
 function framedLabel(s: string) {
-  if (s === 'framed') return 'Framed';
+  if (s === 'framed') return 'Framed, ready to hang';
   if (s === 'stretched') return 'Stretched canvas';
   if (s === 'unframed') return 'Unframed';
   return '';
+}
+
+function typeLabel(t: string) {
+  return t === 'original' ? 'Original' : 'Print';
 }
 
 export default function ArtistProfilePage() {
@@ -39,13 +41,13 @@ export default function ArtistProfilePage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  const [activeArtwork, setActiveArtwork] = useState<Artwork | null>(null);
-  const [lightbox, setLightbox] = useState<Artwork | null>(null);
+  const [detail, setDetail] = useState<Artwork | null>(null);
+  const [inquiryFor, setInquiryFor] = useState<Artwork | null>(null);
   const [inquiryForm, setInquiryForm] = useState({ buyerName: '', buyerContact: '', message: '' });
   const [inquirySent, setInquirySent] = useState(false);
   const [inquirySending, setInquirySending] = useState(false);
   const [inquiryError, setInquiryError] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<'' | 'profile' | 'piece'>('');
 
   useEffect(() => {
     async function load() {
@@ -54,15 +56,20 @@ export default function ArtistProfilePage() {
       const data = await res.json();
       setArtist(data.artist);
       setArtworks(data.artworks);
+      const pieceId = new URLSearchParams(window.location.search).get('piece');
+      const match = (data.artworks as Artwork[]).find(x => x.id === pieceId);
+      if (match) setDetail(match);
       setLoading(false);
     }
     load();
   }, [id]);
 
   useEffect(() => {
-    if (!activeArtwork && !lightbox) return;
+    if (!detail && !inquiryFor) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') { setActiveArtwork(null); setLightbox(null); }
+      if (e.key !== 'Escape') return;
+      if (inquiryFor) setInquiryFor(null);
+      else setDetail(null);
     }
     window.addEventListener('keydown', onKey);
     const prevOverflow = document.body.style.overflow;
@@ -71,24 +78,25 @@ export default function ArtistProfilePage() {
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [activeArtwork, lightbox]);
+  }, [detail, inquiryFor]);
 
   function openInquiry(a: Artwork) {
-    setActiveArtwork(a);
+    setDetail(null);
+    setInquiryFor(a);
     setInquirySent(false);
     setInquiryError('');
   }
 
   async function sendInquiry(e: React.FormEvent) {
     e.preventDefault();
-    if (!activeArtwork) return;
+    if (!inquiryFor) return;
     setInquirySending(true);
     setInquiryError('');
     try {
       const res = await fetch('/api/artwork-inquiries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ artworkId: activeArtwork.id, ...inquiryForm })
+        body: JSON.stringify({ artworkId: inquiryFor.id, ...inquiryForm })
       });
       if (res.ok) setInquirySent(true);
       else setInquiryError('Something went wrong. Please try again.');
@@ -98,10 +106,10 @@ export default function ArtistProfilePage() {
     setInquirySending(false);
   }
 
-  function copyLink() {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  function copy(text: string, which: 'profile' | 'piece') {
+    navigator.clipboard.writeText(text);
+    setCopied(which);
+    setTimeout(() => setCopied(''), 2000);
   }
 
   const filtered = artworks.filter(a => filter === 'all' || a.listing_type === filter);
@@ -114,9 +122,9 @@ export default function ArtistProfilePage() {
         <div className="h-4 w-32 bg-sand rounded motion-safe:animate-pulse mb-6" />
         <div className="h-4 w-full max-w-prose bg-sand rounded motion-safe:animate-pulse mb-2" />
         <div className="h-4 w-2/3 max-w-prose bg-sand rounded motion-safe:animate-pulse mb-10" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
           {[0, 1, 2].map(i => (
-            <div key={i} className="aspect-[4/3] bg-sand rounded-xl motion-safe:animate-pulse" />
+            <div key={i} className="aspect-square bg-sand rounded motion-safe:animate-pulse" />
           ))}
         </div>
       </main>
@@ -135,16 +143,26 @@ export default function ArtistProfilePage() {
     );
   }
 
+  const specs: [string, string][] = detail
+    ? ([
+        ['Medium', detail.medium],
+        ['Style', detail.style],
+        ['Size', detail.size],
+        ['Framing', framedLabel(detail.framed_status)],
+        ['Year', detail.year],
+      ] as [string, string][]).filter(([, v]) => v)
+    : [];
+
   return (
-    <main className="max-w-4xl mx-auto mt-16 px-6 pb-20">
+    <main className="max-w-4xl mx-auto mt-16 px-6 pb-24">
       <div className="flex justify-between items-start gap-4 mb-2">
         <div>
           <h1 className="text-3xl mb-1">{artist.name}</h1>
           <p className="text-ink-soft">{artist.location}</p>
         </div>
-        <button onClick={copyLink}
+        <button onClick={() => copy(window.location.origin + '/artist/' + id, 'profile')}
           className="min-h-11 text-sm font-medium border border-line bg-card px-4 rounded-full hover:bg-sand whitespace-nowrap">
-          {copied ? 'Copied!' : 'Copy Link'}
+          {copied === 'profile' ? 'Copied!' : 'Copy Link'}
         </button>
       </div>
 
@@ -155,19 +173,19 @@ export default function ArtistProfilePage() {
       </div>
 
       <p className="text-ink mb-3 max-w-prose">{artist.bio}</p>
-      <p className="text-sm font-mono text-ink-soft mb-12">
+      <p className="text-sm font-mono text-ink-soft mb-14">
         From {artist.price_range} · {artist.turnaround} · Ships {artist.ships_to || 'by arrangement'}
       </p>
 
-      <div className="flex items-baseline justify-between mb-4">
-        <h2 className="text-xl">
-          Artwork <span className="font-mono text-sm text-ink-soft font-normal">({filtered.length})</span>
-        </h2>
-      </div>
+      <h2 className="text-xl mb-4">
+        Artwork <span className="font-mono text-sm text-ink-soft font-normal">({filtered.length})</span>
+      </h2>
 
-      <div className="flex gap-2 mb-6 flex-wrap">
+      <div role="group" aria-label="Filter artwork" className="flex gap-x-7 border-b border-line mb-10">
         {([['all', 'All'], ['original', 'Originals'], ['print', 'Prints']] as const).map(([t, label]) => (
-          <button key={t} onClick={() => setFilter(t)} className={pillClass(filter === t)}>{label}</button>
+          <button key={t} onClick={() => setFilter(t)} aria-pressed={filter === t} className={tabClass(filter === t)}>
+            {label}
+          </button>
         ))}
       </div>
 
@@ -183,71 +201,108 @@ export default function ArtistProfilePage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-14">
         {filtered.map(a => (
-          <div key={a.id}
-            className="group bg-card border border-line rounded-xl overflow-hidden shadow-sm transition-shadow hover:shadow-md">
-            <div className="relative overflow-hidden">
+          <button key={a.id} onClick={() => setDetail(a)} className="group block w-full text-left">
+            <span className="block aspect-square">
               {a.image_url ? (
-                <button onClick={() => setLightbox(a)} aria-label={`View ${a.title} larger`}
-                  className="block w-full cursor-zoom-in">
-                  <img src={a.image_url} alt={a.title}
-                    className="w-full aspect-[4/3] object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover:scale-[1.03]" />
-                </button>
+                <img src={a.image_url} alt=""
+                  className="w-full h-full object-contain object-bottom drop-shadow-sm motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.015]" />
               ) : (
-                <div className="w-full aspect-[4/3] bg-sand" />
+                <span className="block w-full h-full bg-sand" />
               )}
-              <span className="absolute top-2 left-2 text-xs font-semibold px-2.5 py-1 rounded-full bg-badge text-badge-ink pointer-events-none">
-                {a.listing_type === 'original' ? 'Original' : 'Print'}
-              </span>
+            </span>
+            <span className="block mt-4 font-display text-lg leading-snug">{a.title}</span>
+            <span className="block text-xs text-ink-soft mt-1">{typeLabel(a.listing_type)}</span>
+            <span className="block text-sm font-medium mt-2">
+              {a.price}
               {a.status === 'sold' && (
-                <span className="absolute top-2 right-2 text-xs font-semibold px-2.5 py-1 rounded-full bg-ink text-cream pointer-events-none">Sold</span>
+                <span className="ml-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ink text-cream align-middle">Sold</span>
               )}
-            </div>
-            <div className="p-4">
-              <p className="font-medium">{a.title}{a.year ? `, ${a.year}` : ''}</p>
-              <p className="text-xs text-ink-soft mb-3">
-                {[a.medium, a.style, a.size, framedLabel(a.framed_status)].filter(Boolean).join(' · ')}
-              </p>
-              <div className="flex justify-between items-center gap-3">
-                <span className="font-mono text-sm">{a.price}</span>
-                {a.status !== 'sold' && (
-                  <button onClick={() => openInquiry(a)}
-                    className="min-h-11 bg-brand text-cream px-4 rounded-lg text-sm font-medium hover:bg-brand-deep">
-                    Inquire
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+            </span>
+          </button>
         ))}
       </div>
 
-      {lightbox && (
-        <div className="fixed inset-0 bg-ink/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-          onClick={() => setLightbox(null)}>
-          <div role="dialog" aria-modal="true" aria-label={lightbox.title}
-            className="relative" onClick={e => e.stopPropagation()}>
-            <button type="button" onClick={() => setLightbox(null)} aria-label="Close"
-              className="absolute top-2 right-2 w-11 h-11 rounded-full bg-cream/90 flex items-center justify-center text-xl text-ink hover:bg-cream">
-              ×
-            </button>
-            <img src={lightbox.image_url} alt={lightbox.title}
-              className="max-h-[80vh] max-w-full object-contain rounded-lg" />
-            <p className="text-cream text-sm mt-3 text-center">
-              {lightbox.title}{lightbox.year ? `, ${lightbox.year}` : ''}
-            </p>
+      {detail && (
+        <div className="fixed inset-0 bg-ink/50 backdrop-blur-sm z-50 overflow-y-auto" onClick={() => setDetail(null)}>
+          <div className="min-h-full flex items-center justify-center p-4 sm:p-8">
+            <div role="dialog" aria-modal="true" aria-labelledby="detail-title"
+              className="relative bg-card rounded-xl w-full max-w-4xl grid md:grid-cols-5 shadow-lg"
+              onClick={e => e.stopPropagation()}>
+              <button type="button" autoFocus onClick={() => setDetail(null)} aria-label="Close"
+                className="absolute top-2 right-2 z-10 w-11 h-11 rounded-full bg-card/90 flex items-center justify-center text-xl text-ink hover:bg-sand">
+                ×
+              </button>
+
+              <div className="md:col-span-3 p-6 sm:p-8 flex items-center justify-center bg-sand/50 rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+                {detail.image_url ? (
+                  <a href={detail.image_url} target="_blank" rel="noreferrer" aria-label="Open the full size image in a new tab">
+                    <img src={detail.image_url} alt={detail.title}
+                      className="max-h-[60vh] w-auto max-w-full object-contain drop-shadow-sm" />
+                  </a>
+                ) : (
+                  <div className="w-full aspect-square bg-sand" />
+                )}
+              </div>
+
+              <div className="md:col-span-2 p-6 sm:p-8">
+                <p className="font-mono text-xs text-ink-soft mb-2">{typeLabel(detail.listing_type)}</p>
+                <h2 id="detail-title" className="text-2xl mb-1 pr-10 md:pr-0">{detail.title}</h2>
+                <p className="text-sm text-ink-soft mb-5">by {artist.name}</p>
+
+                {detail.description && (
+                  <p className="text-sm text-ink mb-6 whitespace-pre-line">{detail.description}</p>
+                )}
+
+                {specs.length > 0 && (
+                  <dl className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-1.5 text-sm mb-6">
+                    {specs.map(([label, value]) => (
+                      <div key={label} className="contents">
+                        <dt className="text-ink-soft">{label}</dt>
+                        <dd>{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+
+                <p className="font-mono text-lg mb-5">
+                  {detail.price}
+                  {detail.status === 'sold' && (
+                    <span className="ml-3 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ink text-cream align-middle">Sold</span>
+                  )}
+                </p>
+
+                {detail.status === 'sold' ? (
+                  <p className="text-sm text-ink-soft mb-5">
+                    This piece has been sold. You can{' '}
+                    <Link href="/commission" className="underline text-blue-deep">request a commission</Link>{' '}
+                    in a similar style.
+                  </p>
+                ) : (
+                  <button onClick={() => openInquiry(detail)}
+                    className="w-full min-h-11 bg-brand text-cream px-4 rounded-lg font-medium hover:bg-brand-deep mb-3">
+                    Inquire About This Piece
+                  </button>
+                )}
+
+                <button onClick={() => copy(window.location.origin + '/artist/' + id + '?piece=' + detail.id, 'piece')}
+                  className="min-h-11 text-sm text-ink-soft underline hover:text-ink">
+                  {copied === 'piece' ? 'Link copied' : 'Copy link to this piece'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {activeArtwork && (
+      {inquiryFor && (
         <div className="fixed inset-0 bg-ink/40 backdrop-blur-sm flex items-center justify-center p-6 z-50"
-          onClick={() => setActiveArtwork(null)}>
+          onClick={() => setInquiryFor(null)}>
           <div role="dialog" aria-modal="true" aria-labelledby="inquiry-title"
             className="relative bg-card rounded-xl p-7 max-w-sm w-full shadow-lg"
             onClick={e => e.stopPropagation()}>
-            <button type="button" onClick={() => setActiveArtwork(null)} aria-label="Close"
+            <button type="button" onClick={() => setInquiryFor(null)} aria-label="Close"
               className="absolute top-1 right-1 w-11 h-11 flex items-center justify-center text-xl text-ink-soft hover:text-ink">
               ×
             </button>
@@ -256,7 +311,7 @@ export default function ArtistProfilePage() {
               <>
                 <h3 id="inquiry-title" className="text-xl mb-1">Inquiry sent.</h3>
                 <p className="text-ink-soft text-sm mb-4">We&apos;ll pass this along and follow up soon.</p>
-                <button onClick={() => setActiveArtwork(null)}
+                <button onClick={() => setInquiryFor(null)}
                   className="min-h-11 text-sm font-medium border border-line px-5 rounded-lg hover:bg-sand">
                   Close
                 </button>
@@ -264,7 +319,7 @@ export default function ArtistProfilePage() {
             ) : (
               <form onSubmit={sendInquiry} className="space-y-3">
                 <h3 id="inquiry-title" className="text-xl mb-1 pr-8">Inquire About This Piece</h3>
-                <p className="text-ink-soft text-sm mb-3">{activeArtwork.title}</p>
+                <p className="text-ink-soft text-sm mb-3">{inquiryFor.title}</p>
                 <input required autoFocus placeholder="Your name" value={inquiryForm.buyerName}
                   onChange={e => setInquiryForm({ ...inquiryForm, buyerName: e.target.value })} className={inputClass} />
                 <input required placeholder="Email or WhatsApp" value={inquiryForm.buyerContact}
@@ -277,7 +332,7 @@ export default function ArtistProfilePage() {
                     className="flex-1 min-h-11 bg-brand text-cream px-4 rounded-lg font-medium hover:bg-brand-deep disabled:opacity-50">
                     {inquirySending ? 'Sending…' : 'Send Inquiry'}
                   </button>
-                  <button type="button" onClick={() => setActiveArtwork(null)}
+                  <button type="button" onClick={() => setInquiryFor(null)}
                     className="min-h-11 border border-line bg-card px-4 rounded-lg hover:bg-sand">
                     Cancel
                   </button>

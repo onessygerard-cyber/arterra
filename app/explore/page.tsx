@@ -36,11 +36,9 @@ function extractPrice(priceStr: string): number {
   return isNaN(num) ? 0 : num;
 }
 
-const pillClass = (active: boolean) =>
-  `inline-flex items-center min-h-11 text-sm font-medium px-4 rounded-full border transition-colors ${
-    active
-      ? 'bg-blue-deep text-cream border-blue-deep'
-      : 'bg-card text-ink-soft border-line hover:bg-sand hover:text-ink'
+const tabClass = (active: boolean) =>
+  `min-h-11 px-1 text-sm font-medium border-b-2 -mb-px transition-colors ${
+    active ? 'border-blue-deep text-ink' : 'border-transparent text-ink-soft hover:text-ink'
   }`;
 
 const controlBase =
@@ -83,12 +81,6 @@ export default function ExplorePage() {
     setFavorites(getFavorites());
   }, []);
 
-  function handleToggleFavorite(id: string, e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    setFavorites(toggleFavorite(id));
-  }
-
   function resetFilters() {
     setQuery('');
     setPriceRange('all');
@@ -126,12 +118,12 @@ export default function ExplorePage() {
         <div className="h-7 w-48 bg-sand rounded motion-safe:animate-pulse mb-3" />
         <div className="h-4 w-24 bg-sand rounded motion-safe:animate-pulse mb-8" />
         <div className="h-11 bg-sand rounded-lg motion-safe:animate-pulse mb-5" />
-        <div className="flex gap-2 mb-8">
+        <div className="flex gap-7 mb-8">
           {[0, 1, 2, 3].map(i => (
-            <div key={i} className="h-11 w-24 bg-sand rounded-full motion-safe:animate-pulse" />
+            <div key={i} className="h-6 w-16 bg-sand rounded motion-safe:animate-pulse" />
           ))}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {[0, 1].map(i => (
             <div key={i} className="h-44 bg-sand rounded-xl motion-safe:animate-pulse" />
           ))}
@@ -141,11 +133,11 @@ export default function ExplorePage() {
   }
 
   return (
-    <main className="max-w-4xl mx-auto mt-16 px-6 pb-20">
+    <main className="max-w-4xl mx-auto mt-16 px-6 pb-24">
       <h1 className="text-2xl mb-1">Explore Artists</h1>
-      <p className="text-ink-soft mb-6">{artists.length} verified</p>
+      <p className="text-ink-soft mb-8">{artists.length} verified</p>
 
-      <div className="relative mb-5">
+      <div className="relative mb-6">
         <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-soft pointer-events-none"
           width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -157,11 +149,11 @@ export default function ExplorePage() {
           className="w-full min-h-11 border border-line rounded-lg pl-11 pr-4 py-2.5 bg-card focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue" />
       </div>
 
-      <div className="flex gap-2 mb-8 flex-wrap">
+      <div role="group" aria-label="Browse" className="flex flex-wrap gap-x-7 border-b border-line mb-10">
         {([
           ['artists', 'Artists'], ['all', 'All Art'], ['original', 'Originals'], ['print', 'Prints']
         ] as const).map(([v, label]) => (
-          <button key={v} onClick={() => setView(v)} className={pillClass(view === v)}>
+          <button key={v} onClick={() => setView(v)} aria-pressed={view === v} className={tabClass(view === v)}>
             {label}
           </button>
         ))}
@@ -174,7 +166,7 @@ export default function ExplorePage() {
               ? <EmptyState message="No artists yet. Applications are reviewed by hand." />
               : <EmptyState message="No artists match your search." onReset={resetFilters} />
           )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {filteredArtists.map(a => (
               <Link key={a.id} href={`/artist/${a.id}`}
                 className="block bg-card border border-line rounded-xl p-6 shadow-sm hover:border-blue/40">
@@ -193,7 +185,7 @@ export default function ExplorePage() {
         </>
       ) : (
         <>
-          <div className="flex gap-2 mb-5 flex-wrap">
+          <div className="flex gap-2 mb-8 flex-wrap">
             <select aria-label="Sort" value={sort} onChange={e => setSort(e.target.value as Sort)}
               className={`${controlBase} border-line bg-card text-ink`}>
               <option value="newest">Newest first</option>
@@ -219,33 +211,44 @@ export default function ExplorePage() {
               : <EmptyState message="No pieces match your filters." onReset={resetFilters} />
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-            {filteredArtworks.map(a => (
-              <Link key={a.id} href={`/artist/${a.artist_id}`}
-                className="group block bg-card border border-line rounded-xl overflow-hidden shadow-sm transition-shadow hover:shadow-md hover:border-blue/40">
-                <div className="relative overflow-hidden">
-                  {a.image_url && <img src={a.image_url} alt={a.title} className="w-full aspect-[4/3] object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover:scale-[1.03]" />}
-                  <span className="absolute top-2 left-2 text-xs font-semibold px-2.5 py-1 rounded-full bg-badge text-badge-ink">
-                    {a.listing_type === 'original' ? 'Original' : 'Print'}
-                  </span>
-                  {a.status === 'sold' && (
-                    <span className="absolute top-2 right-2 text-xs font-semibold px-2.5 py-1 rounded-full bg-ink text-cream">Sold</span>
-                  )}
-                  <button onClick={e => handleToggleFavorite(a.id, e)}
-                    aria-label={favorites.includes(a.id) ? 'Remove from saved' : 'Save this piece'}
-                    className="absolute bottom-0 right-0 p-2">
-                    <span className="flex w-8 h-8 rounded-full bg-cream/90 items-center justify-center text-sm">
-                      {favorites.includes(a.id) ? '♥' : '♡'}
-                    </span>
-                  </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-14">
+            {filteredArtworks.map(a => {
+              const href = `/artist/${a.artist_id}?piece=${a.id}`;
+              const saved = favorites.includes(a.id);
+              return (
+                <div key={a.id} className="group">
+                  <Link href={href} className="block" tabIndex={-1} aria-hidden="true">
+                    <div className="aspect-square">
+                      {a.image_url ? (
+                        <img src={a.image_url} alt=""
+                          className="w-full h-full object-contain object-bottom drop-shadow-sm motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.015]" />
+                      ) : (
+                        <div className="w-full h-full bg-sand" />
+                      )}
+                    </div>
+                  </Link>
+                  <div className="mt-4 flex items-start justify-between gap-2">
+                    <Link href={href} className="block min-w-0">
+                      <span className="block font-display text-lg leading-snug">{a.title}</span>
+                      <span className="block text-xs text-ink-soft mt-1">
+                        {a.artists?.name} · {a.listing_type === 'original' ? 'Original' : 'Print'}
+                      </span>
+                      <span className="block text-sm font-medium mt-2">
+                        {a.price}
+                        {a.status === 'sold' && (
+                          <span className="ml-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ink text-cream align-middle">Sold</span>
+                        )}
+                      </span>
+                    </Link>
+                    <button onClick={() => setFavorites(toggleFavorite(a.id))}
+                      aria-label={saved ? 'Remove from saved' : 'Save this piece'}
+                      className={`w-11 h-11 -mr-2 -mt-2 flex items-center justify-center text-lg hover:text-ink ${saved ? 'text-ink' : 'text-ink-soft'}`}>
+                      {saved ? '♥' : '♡'}
+                    </button>
+                  </div>
                 </div>
-                <div className="p-4">
-                  <p className="font-medium">{a.title}</p>
-                  <p className="text-xs text-ink-soft mb-1">{a.artists?.name}</p>
-                  <p className="text-sm font-mono">{a.price}</p>
-                </div>
-              </Link>
-            ))}
+              );
+            })}
           </div>
         </>
       )}
