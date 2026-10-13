@@ -31,7 +31,7 @@ function Stepper({ status }: { status: string }) {
         const isCurrent = !allDone && i === current;
         return (
           <li key={s} aria-current={isCurrent ? 'step' : undefined}
-            className={`border-t-4 pt-2 ${done ? 'border-gold' : isCurrent ? 'border-ink' : 'border-line'}`}>
+            className={`border-t-4 pt-2 ${done ? 'border-ink' : isCurrent ? 'border-brand' : 'border-line'}`}>
             <span className="font-mono text-[11px] text-ink-soft block">0{i + 1}</span>
             <span className={`text-xs leading-snug block ${isCurrent ? 'font-semibold text-ink' : done ? 'text-ink' : 'text-ink-soft'}`}>
               {STEP_LABELS[s]}
@@ -118,12 +118,12 @@ function TrackContent() {
       {commissions.length === 0 && (
         <div className="bg-card border border-line rounded-xl p-6 shadow-sm">
           <ol className="grid grid-cols-2 gap-x-3 mb-4">
-            <li className="border-t-4 border-gold pt-2">
+            <li className="border-t-4 border-ink pt-2">
               <span className="font-mono text-[11px] text-ink-soft block">01</span>
               <span className="text-xs text-ink block">Request received</span>
               <span className="sr-only">Completed</span>
             </li>
-            <li aria-current="step" className="border-t-4 border-ink pt-2">
+            <li aria-current="step" className="border-t-4 border-brand pt-2">
               <span className="font-mono text-[11px] text-ink-soft block">02</span>
               <span className="text-xs font-semibold text-ink block">Matching with an artist</span>
               <span className="sr-only">Current step</span>

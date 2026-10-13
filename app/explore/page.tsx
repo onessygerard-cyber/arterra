@@ -39,7 +39,7 @@ function extractPrice(priceStr: string): number {
 const pillClass = (active: boolean) =>
   `inline-flex items-center min-h-11 text-sm font-medium px-4 rounded-full border transition-colors ${
     active
-      ? 'bg-ink text-cream border-ink'
+      ? 'bg-blue-deep text-cream border-blue-deep'
       : 'bg-card text-ink-soft border-line hover:bg-sand hover:text-ink'
   }`;
 
@@ -208,7 +208,7 @@ export default function ExplorePage() {
               <option value="over500">$500+</option>
             </select>
             <button onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-              className={`${controlBase} font-medium ${showFavoritesOnly ? 'bg-ink text-cream border-ink' : 'bg-card text-ink border-line hover:bg-sand'}`}>
+              className={`${controlBase} font-medium ${showFavoritesOnly ? 'bg-blue-deep text-cream border-blue-deep' : 'bg-card text-ink border-line hover:bg-sand'}`}>
               ♥ Saved ({favorites.length})
             </button>
           </div>
