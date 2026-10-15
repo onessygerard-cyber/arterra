@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import FadeImage from '@/components/FadeImage';
 
 type Artist = {
   id: string; name: string; location: string; mediums: string[]; styles: string[];
@@ -220,7 +221,7 @@ export default function ExplorePage() {
                   <Link href={href} className="block" tabIndex={-1} aria-hidden="true">
                     <div className="aspect-square">
                       {a.image_url ? (
-                        <img src={a.image_url} alt=""
+                        <FadeImage src={a.image_url} alt=""
                           className="w-full h-full object-contain object-bottom drop-shadow-sm motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.015]" />
                       ) : (
                         <div className="w-full h-full bg-sand" />

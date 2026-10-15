@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const navLink =
-  "text-sm font-medium px-3 py-2 rounded-full hover:bg-sand text-ink-soft hover:text-ink";
+  "inline-flex items-center min-h-11 text-sm font-medium px-3 rounded-full hover:bg-sand text-ink-soft hover:text-ink";
 
 export default function Header() {
   return (
@@ -23,7 +23,7 @@ export default function Header() {
           <Link href="/commission" className={navLink}>Commission</Link>
           <Link href="/join" className={navLink}>Register</Link>
           <Link href="/artist-login" className={navLink}>Artist Login</Link>
-          <Link href="/studio" className="text-xs font-medium px-3 py-2 rounded-full text-ink-soft/70 hover:text-ink-soft">
+          <Link href="/studio" className="inline-flex items-center min-h-11 text-xs font-medium px-3 rounded-full text-ink-soft/70 hover:text-ink-soft">
             Studio
           </Link>
         </nav>

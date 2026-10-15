@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import FadeImage from '@/components/FadeImage';
 
 type Artist = {
   id: string; name: string; location: string; bio: string; price_range: string;
@@ -206,7 +207,7 @@ export default function ArtistProfilePage() {
           <button key={a.id} onClick={() => setDetail(a)} className="group block w-full text-left">
             <span className="block aspect-square">
               {a.image_url ? (
-                <img src={a.image_url} alt=""
+                <FadeImage src={a.image_url} alt=""
                   className="w-full h-full object-contain object-bottom drop-shadow-sm motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.015]" />
               ) : (
                 <span className="block w-full h-full bg-sand" />
