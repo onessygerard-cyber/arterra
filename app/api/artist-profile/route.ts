@@ -17,7 +17,8 @@ export async function GET(request: Request) {
   if (!artist) return NextResponse.json({ error: 'Artist not found' }, { status: 404 });
 
   const { data: artworks } = await supabaseAdmin
-    .from('artworks').select('*').eq('artist_id', id).in('status', ['approved', 'sold']);
+    .from('artworks').select('*').eq('artist_id', id).in('status', ['approved', 'sold'])
+    .order('created_at', { ascending: false });
 
   return NextResponse.json({ artist, artworks: artworks || [] });
 }

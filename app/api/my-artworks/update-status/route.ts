@@ -25,8 +25,8 @@ export async function POST(request: Request) {
   if (!artwork || artwork.artist_id !== artist.id) {
     return NextResponse.json({ error: 'Not your artwork' }, { status: 403 });
   }
-  if (artwork.status === 'pending') {
-    return NextResponse.json({ error: 'This piece is still awaiting approval.' }, { status: 400 });
+  if (!['approved', 'sold'].includes(artwork.status)) {
+    return NextResponse.json({ error: 'This piece cannot be changed right now.' }, { status: 400 });
   }
 
   const { error } = await supabaseAdmin.from('artworks').update({ status }).eq('id', artworkId);

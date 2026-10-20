@@ -6,10 +6,13 @@ export async function GET() {
     .from('artists')
     .select('id, name, location, mediums, styles, bio, price_range')
     .eq('status', 'verified');
+
   const { data: artworks } = await supabaseAdmin
     .from('artworks')
-    .select('*, artists(name)')
-    .in('status', ['approved', 'sold']);
+    .select('*, artists!inner(name)')
+    .eq('artists.status', 'verified')
+    .in('status', ['approved', 'sold'])
+    .order('created_at', { ascending: false });
 
   return NextResponse.json({ artists: artists || [], artworks: artworks || [] });
 }

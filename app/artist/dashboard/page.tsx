@@ -85,9 +85,9 @@ export default function ArtistDashboard() {
     if (res2.ok) setArtworks(body2.artworks);
   }
 
-  const STATUS_LABEL: Record<string, string> = { pending: 'Pending review', approved: 'Live', sold: 'Sold' };
+  const STATUS_LABEL: Record<string, string> = { pending: 'Pending review', approved: 'Live', sold: 'Sold', rejected: 'Not accepted', hidden: 'Hidden' };
   const STATUS_COLOR: Record<string, string> = {
-    pending: 'bg-gold/20 text-gold-deep', approved: 'bg-blue/15 text-blue-deep', sold: 'bg-ink/10 text-ink',
+    pending: 'bg-gold/20 text-gold-deep', approved: 'bg-blue/15 text-blue-deep', sold: 'bg-ink/10 text-ink', rejected: 'bg-red-100 text-red-800', hidden: 'bg-ink/10 text-ink-soft',
   };
 
   if (checking) return <main className="max-w-4xl mx-auto mt-16 px-6 text-ink-soft">Loading…</main>;
@@ -141,7 +141,7 @@ export default function ArtistDashboard() {
                 <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_COLOR[a.status] || ''}`}>
                   {STATUS_LABEL[a.status] || a.status}
                 </span>
-                {a.status !== 'pending' && (
+                {(a.status === 'approved' || a.status === 'sold') && (
                   <button onClick={() => toggleSold(a.id, a.status)}
                     className="mt-3 w-full border border-line px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-sand">
                     {a.status === 'sold' ? 'Mark as Available' : 'Mark as Sold'}
