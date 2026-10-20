@@ -76,7 +76,7 @@ function TrackContent() {
       const res = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ commissionId, from: brief.buyer_name, text })
+        body: JSON.stringify({ commissionId, trackToken: token, text })
       });
       if (!res.ok) { setSendError('Your message could not be sent. Please try again.'); return; }
       setDraft({ ...draft, [commissionId]: '' });

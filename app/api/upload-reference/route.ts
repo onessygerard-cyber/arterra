@@ -1,25 +1,31 @@
+import { randomUUID } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { rateLimited } from '@/lib/rate-limit';
 import { NextResponse } from 'next/server';
 
+const TYPES: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+const MAX_BYTES = 4 * 1024 * 1024;
+
 export async function POST(request: Request) {
-  const formData = await request.formData();
-  const file = formData.get('file') as File | null;
-  if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 });
-  if (!file.type.startsWith('image/')) {
-    return NextResponse.json({ error: 'Only image files are allowed.' }, { status: 400 });
-  }
-  if (file.size > 4 * 1024 * 1024) {
-    return NextResponse.json({ error: 'Each image must be under 4 MB.' }, { status: 400 });
+  if (await rateLimited(request, 'upload-reference', 12, 3600)) {
+    return NextResponse.json({ error: 'Too many uploads. Please try again later.' }, { status: 429 });
   }
 
-  const fileExt = file.name.split('.').pop();
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${fileExt}`;
+  const formData = await request.formData();
+  const file = formData.get('file') as File | null;
+  if (!file) return NextResponse.json({ error: 'No file provided.' }, { status: 400 });
+
+  const ext = TYPES[file.type];
+  if (!ext) return NextResponse.json({ error: 'Please use a JPG, PNG or WebP image.' }, { status: 400 });
+  if (file.size > MAX_BYTES) return NextResponse.json({ error: 'Each image must be under 4 MB.' }, { status: 400 });
+
+  const path = `${Date.now()}-${randomUUID().replace(/-/g, '').slice(0, 12)}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
 
   const { error } = await supabaseAdmin.storage
     .from('brief-references')
     .upload(path, buffer, { contentType: file.type });
+  if (error) return NextResponse.json({ error: 'The upload failed. Please try again.' }, { status: 500 });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true, path });
 }

@@ -60,8 +60,8 @@ export default function ArtistDashboard() {
     if (!text || !artist) return;
     await fetch('/api/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ commissionId, from: artist.name, text })
+      headers: { 'Content-Type': 'application/json', Authorization: \Bearer ${token}` },`
+      body: JSON.stringify({ commissionId, text })
     });
     setDraft({ ...draft, [commissionId]: '' });
     loadCommissions(token);

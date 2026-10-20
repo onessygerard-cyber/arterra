@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { requireArtist } from '@/lib/require-artist';
+import { notifyAdmin } from '@/lib/notify';
 import { NextResponse } from 'next/server';
 
 const LISTING_TYPES = ['original', 'print'];
@@ -42,5 +43,6 @@ export async function POST(request: Request) {
     .select();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  await notifyAdmin('New artwork submission', [`Artist: ${auth.artist.name}`, `Title: ${title}`]);
   return NextResponse.json({ success: true, artwork: data[0] });
 }
