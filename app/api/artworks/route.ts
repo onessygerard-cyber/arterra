@@ -14,12 +14,18 @@ export async function POST(request: Request) {
   const auth = await requireArtist(request);
   if (!auth) return NextResponse.json({ error: 'Please log in again.' }, { status: 401 });
 
-  const body = await request.json();
+  const body = await request.json().catch(() => ({}));
   const title = clean(body.title, 200);
   if (!title) return NextResponse.json({ error: 'Add a title.' }, { status: 400 });
 
+  const priceOnRequest = body.priceOnRequest === true;
+  const price = priceOnRequest ? '' : clean(body.price, 60);
+  if (!priceOnRequest && !price) {
+    return NextResponse.json({ error: 'Add a price, or choose Price on request.' }, { status: 400 });
+  }
+
   const imageUrl = clean(body.imageUrl, 1000);
-  const allowedPrefix = `${process.env.SUPABASE_URL}/storage/v1/object/public/artwork-images/`;
+  const allowedPrefix = `${process.env.SUPABASE_URL}/storage/v1/object/public/artwork-images/${auth.artist.id}/`;
   if (!imageUrl.startsWith(allowedPrefix)) {
     return NextResponse.json({ error: 'The image is not valid. Please upload it again.' }, { status: 400 });
   }
@@ -33,7 +39,8 @@ export async function POST(request: Request) {
       listing_type: LISTING_TYPES.includes(body.listingType) ? body.listingType : 'original',
       medium: clean(body.medium, 120),
       size: clean(body.size, 120),
-      price: clean(body.price, 60),
+      price,
+      price_on_request: priceOnRequest,
       year: clean(body.year, 10),
       style: clean(body.style, 120),
       framed_status: FRAMED.includes(body.framedStatus) ? body.framedStatus : '',
@@ -42,7 +49,8 @@ export async function POST(request: Request) {
     })
     .select();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'The piece could not be saved. Please try again.' }, { status: 500 });
+
   await notifyAdmin('New artwork submission', [`Artist: ${auth.artist.name}`, `Title: ${title}`]);
   return NextResponse.json({ success: true, artwork: data[0] });
 }

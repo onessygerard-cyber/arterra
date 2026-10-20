@@ -8,7 +8,7 @@ export async function GET(request: Request) {
 
   const { data: artist, error: artistError } = await supabaseAdmin
     .from('artists')
-    .select('id, name, location, mediums, styles, bio, price_range, turnaround, ships_to')
+    .select('id, name, location, mediums, styles, bio, price_range, turnaround, ships_to, photo_url')
     .eq('id', id)
     .eq('status', 'verified')
     .maybeSingle();

@@ -3,14 +3,16 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import FadeImage from '@/components/FadeImage';
+import Avatar from '@/components/Avatar';
 
 type Artist = {
   id: string; name: string; location: string; mediums: string[]; styles: string[];
-  bio: string; price_range: string;
+  bio: string; price_range: string; photo_url: string | null;
 };
 type Artwork = {
   id: string; title: string; listing_type: string; medium: string; price: string;
-  image_url: string; artist_id: string; status: string; artists: { name: string } | null;
+  price_on_request: boolean | null; image_url: string; artist_id: string; status: string;
+  artists: { name: string } | null;
 };
 type View = 'artists' | 'all' | 'original' | 'print';
 type Sort = 'newest' | 'price-low' | 'price-high';
@@ -35,6 +37,14 @@ function toggleFavorite(id: string): string[] {
 function extractPrice(priceStr: string): number {
   const num = parseFloat((priceStr || '').replace(/[^0-9.]/g, ''));
   return isNaN(num) ? 0 : num;
+}
+
+function onRequest(a: { price: string; price_on_request: boolean | null }): boolean {
+  return !!a.price_on_request || !(a.price || '').trim();
+}
+
+function priceLabel(a: { price: string; price_on_request: boolean | null }): string {
+  return onRequest(a) ? 'Price on request' : a.price;
 }
 
 const tabClass = (active: boolean) =>
@@ -101,6 +111,7 @@ export default function ExplorePage() {
     )
     .filter(a => {
       if (priceRange === 'all') return true;
+      if (onRequest(a)) return false;
       const p = extractPrice(a.price);
       if (priceRange === 'under100') return p < 100;
       if (priceRange === '100-500') return p >= 100 && p <= 500;
@@ -108,9 +119,14 @@ export default function ExplorePage() {
     })
     .filter(a => !showFavoritesOnly || favorites.includes(a.id))
     .sort((a, b) => {
-      if (sort === 'price-low') return extractPrice(a.price) - extractPrice(b.price);
-      if (sort === 'price-high') return extractPrice(b.price) - extractPrice(a.price);
-      return 0;
+      if (sort === 'newest') return 0;
+      const ra = onRequest(a);
+      const rb = onRequest(b);
+      if (ra !== rb) return ra ? 1 : -1;
+      if (ra && rb) return 0;
+      return sort === 'price-low'
+        ? extractPrice(a.price) - extractPrice(b.price)
+        : extractPrice(b.price) - extractPrice(a.price);
     });
 
   if (loading) {
@@ -171,8 +187,13 @@ export default function ExplorePage() {
             {filteredArtists.map(a => (
               <Link key={a.id} href={`/artist/${a.id}`}
                 className="block bg-card border border-line rounded-xl p-6 shadow-sm hover:border-blue/40">
-                <h3 className="font-display text-lg mb-0.5">{a.name}</h3>
-                <p className="text-sm text-ink-soft mb-3">{a.location}</p>
+                <div className="flex items-center gap-3 mb-3">
+                  <Avatar name={a.name} src={a.photo_url} size={48} />
+                  <div className="min-w-0">
+                    <h3 className="font-display text-lg leading-tight">{a.name}</h3>
+                    <p className="text-sm text-ink-soft">{a.location}</p>
+                  </div>
+                </div>
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {a.mediums?.map(m => (
                     <span key={m} className="text-xs bg-blue/10 text-blue-deep px-2.5 py-1 rounded-full font-medium">{m}</span>
@@ -235,7 +256,7 @@ export default function ExplorePage() {
                         {a.artists?.name} · {a.listing_type === 'original' ? 'Original' : 'Print'}
                       </span>
                       <span className="block text-sm font-medium mt-2">
-                        {a.price}
+                        {priceLabel(a)}
                         {a.status === 'sold' && (
                           <span className="ml-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ink text-cream align-middle">Sold</span>
                         )}

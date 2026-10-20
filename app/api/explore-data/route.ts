@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   const { data: artists } = await supabaseAdmin
     .from('artists')
-    .select('id, name, location, mediums, styles, bio, price_range')
+    .select('id, name, location, mediums, styles, bio, price_range, photo_url')
     .eq('status', 'verified');
 
   const { data: artworks } = await supabaseAdmin

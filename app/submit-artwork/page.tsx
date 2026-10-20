@@ -16,7 +16,7 @@ export default function SubmitArtworkPage() {
 
   const [form, setForm] = useState({
     title: '', description: '', listingType: 'original', medium: '', size: '',
-    price: '', year: '', framedStatus: '', style: '',
+    price: '', priceOnRequest: false, year: '', framedStatus: '', style: '',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -164,7 +164,14 @@ export default function SubmitArtworkPage() {
         </select>
 
         <input placeholder="Price, e.g. $450" value={form.price}
-          onChange={e => setForm({ ...form, price: e.target.value })} className={inputClass} />
+          required={!form.priceOnRequest} disabled={form.priceOnRequest}
+          onChange={e => setForm({ ...form, price: e.target.value })}
+          className={inputClass + (form.priceOnRequest ? ' opacity-50' : '')} />
+        <label className="flex items-center gap-2 text-sm text-ink-soft min-h-11">
+          <input type="checkbox" checked={form.priceOnRequest}
+            onChange={e => setForm({ ...form, priceOnRequest: e.target.checked })} />
+          Price on request
+        </label>
 
         <div>
           <label className="text-sm font-medium block mb-2">Photo (JPG, PNG or WebP, under 4 MB)</label>

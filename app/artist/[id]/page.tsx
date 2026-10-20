@@ -4,15 +4,16 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import FadeImage from '@/components/FadeImage';
+import Avatar from '@/components/Avatar';
 
 type Artist = {
   id: string; name: string; location: string; bio: string; price_range: string;
-  turnaround: string; mediums: string[]; styles: string[]; ships_to: string;
+  turnaround: string; mediums: string[]; styles: string[]; ships_to: string; photo_url: string | null;
 };
 type Artwork = {
   id: string; title: string; description: string; listing_type: string; medium: string;
-  size: string; price: string; image_url: string; status: string; year: string;
-  framed_status: string; style: string;
+  size: string; price: string; price_on_request: boolean | null; image_url: string; status: string;
+  year: string; framed_status: string; style: string;
 };
 type Filter = 'all' | 'original' | 'print';
 
@@ -30,6 +31,10 @@ function framedLabel(s: string) {
 
 function typeLabel(t: string) {
   return t === 'original' ? 'Original' : 'Print';
+}
+
+function priceLabel(a: Artwork): string {
+  return a.price_on_request || !(a.price || '').trim() ? 'Price on request' : a.price;
 }
 
 export default function ArtistProfilePage() {
@@ -100,7 +105,10 @@ export default function ArtistProfilePage() {
         body: JSON.stringify({ artworkId: inquiryFor.id, ...inquiryForm })
       });
       if (res.ok) setInquirySent(true);
-      else setInquiryError('Something went wrong. Please try again.');
+      else {
+        const data = await res.json().catch(() => ({}));
+        setInquiryError(data.error || 'Something went wrong. Please try again.');
+      }
     } catch {
       setInquiryError('We could not send that. Check your connection and try again.');
     }
@@ -157,9 +165,12 @@ export default function ArtistProfilePage() {
   return (
     <main className="max-w-4xl mx-auto mt-16 px-6 pb-24">
       <div className="flex justify-between items-start gap-4 mb-2">
-        <div>
-          <h1 className="text-3xl mb-1">{artist.name}</h1>
-          <p className="text-ink-soft">{artist.location}</p>
+        <div className="flex items-center gap-4">
+          <Avatar name={artist.name} src={artist.photo_url} size={72} />
+          <div>
+            <h1 className="text-3xl mb-1">{artist.name}</h1>
+            <p className="text-ink-soft">{artist.location}</p>
+          </div>
         </div>
         <button onClick={() => copy(window.location.origin + '/artist/' + id, 'profile')}
           className="min-h-11 text-sm font-medium border border-line bg-card px-4 rounded-full hover:bg-sand whitespace-nowrap">
@@ -216,7 +227,7 @@ export default function ArtistProfilePage() {
             <span className="block mt-4 font-display text-lg leading-snug">{a.title}</span>
             <span className="block text-xs text-ink-soft mt-1">{typeLabel(a.listing_type)}</span>
             <span className="block text-sm font-medium mt-2">
-              {a.price}
+              {priceLabel(a)}
               {a.status === 'sold' && (
                 <span className="ml-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ink text-cream align-middle">Sold</span>
               )}
@@ -268,7 +279,7 @@ export default function ArtistProfilePage() {
                 )}
 
                 <p className="font-mono text-lg mb-5">
-                  {detail.price}
+                  {priceLabel(detail)}
                   {detail.status === 'sold' && (
                     <span className="ml-3 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ink text-cream align-middle">Sold</span>
                   )}
