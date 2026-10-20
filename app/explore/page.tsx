@@ -10,15 +10,32 @@ type Artist = {
   bio: string; price_range: string; photo_url: string | null;
 };
 type Artwork = {
-  id: string; title: string; listing_type: string; medium: string; price: string;
-  price_on_request: boolean | null; image_url: string; artist_id: string; status: string;
-  artists: { name: string } | null;
+  id: string; title: string; listing_type: string; medium: string | null; style: string | null;
+  price: string; price_on_request: boolean | null; image_url: string; artist_id: string;
+  status: string; artists: { name: string } | null;
 };
 type View = 'artists' | 'all' | 'original' | 'print';
 type Sort = 'newest' | 'price-low' | 'price-high';
 type PriceRange = 'all' | 'under100' | '100-500' | 'over500';
 
 const FAVORITES_KEY = 'arterra_favorites';
+
+const MEDIUM_KEYWORDS: [string, string[]][] = [
+  ['Oil', ['oil']],
+  ['Acrylic', ['acrylic']],
+  ['Watercolor', ['watercolor', 'watercolour']],
+  ['Ink', ['ink']],
+  ['Charcoal', ['charcoal']],
+  ['Pencil', ['pencil']],
+  ['Pastel', ['pastel']],
+  ['Mixed media', ['mixed media']],
+  ['Digital', ['digital']],
+];
+
+function mediumHas(medium: string | null | undefined, words: string[]): boolean {
+  const m = (medium || '').toLowerCase();
+  return words.some(w => new RegExp(`\\b${w}\\b`).test(m));
+}
 
 function getFavorites(): string[] {
   try {
@@ -77,6 +94,8 @@ export default function ExplorePage() {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<Sort>('newest');
   const [priceRange, setPriceRange] = useState<PriceRange>('all');
+  const [mediumFilter, setMediumFilter] = useState('');
+  const [styleFilter, setStyleFilter] = useState('');
   const [favorites, setFavorites] = useState<string[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
@@ -96,9 +115,22 @@ export default function ExplorePage() {
     setQuery('');
     setPriceRange('all');
     setShowFavoritesOnly(false);
+    setMediumFilter('');
+    setStyleFilter('');
   }
 
   const q = query.trim().toLowerCase();
+
+  const mediumOptions = MEDIUM_KEYWORDS
+    .filter(([, words]) => artworks.some(a => mediumHas(a.medium, words)))
+    .map(([label]) => label);
+
+  const styleByKey = new Map<string, string>();
+  artworks.forEach(a => {
+    const s = (a.style || '').trim();
+    if (s && !styleByKey.has(s.toLowerCase())) styleByKey.set(s.toLowerCase(), s);
+  });
+  const styleOptions = Array.from(styleByKey.values()).sort((x, y) => x.localeCompare(y));
 
   const filteredArtists = artists.filter(a =>
     !q || a.name.toLowerCase().includes(q) || a.mediums?.some(m => m.toLowerCase().includes(q))
@@ -107,7 +139,11 @@ export default function ExplorePage() {
   const filteredArtworks = artworks
     .filter(a => view === 'all' || a.listing_type === view)
     .filter(a =>
-      !q || a.title.toLowerCase().includes(q) || a.medium?.toLowerCase().includes(q) || a.artists?.name.toLowerCase().includes(q)
+      !q ||
+      a.title.toLowerCase().includes(q) ||
+      a.medium?.toLowerCase().includes(q) ||
+      a.style?.toLowerCase().includes(q) ||
+      a.artists?.name.toLowerCase().includes(q)
     )
     .filter(a => {
       if (priceRange === 'all') return true;
@@ -117,6 +153,12 @@ export default function ExplorePage() {
       if (priceRange === '100-500') return p >= 100 && p <= 500;
       return p > 500;
     })
+    .filter(a => {
+      if (!mediumFilter) return true;
+      const entry = MEDIUM_KEYWORDS.find(([label]) => label === mediumFilter);
+      return entry ? mediumHas(a.medium, entry[1]) : true;
+    })
+    .filter(a => !styleFilter || (a.style || '').trim().toLowerCase() === styleFilter.toLowerCase())
     .filter(a => !showFavoritesOnly || favorites.includes(a.id))
     .sort((a, b) => {
       if (sort === 'newest') return 0;
@@ -161,7 +203,7 @@ export default function ExplorePage() {
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" />
         </svg>
-        <input aria-label="Search" placeholder="Search by name, title, or medium…" value={query}
+        <input aria-label="Search" placeholder="Search by name, title, medium or style…" value={query}
           onChange={e => setQuery(e.target.value)}
           className="w-full min-h-11 border border-line rounded-lg pl-11 pr-4 py-2.5 bg-card focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue" />
       </div>
@@ -221,6 +263,20 @@ export default function ExplorePage() {
               <option value="100-500">$100–$500</option>
               <option value="over500">$500+</option>
             </select>
+            {mediumOptions.length > 0 && (
+              <select aria-label="Medium" value={mediumFilter} onChange={e => setMediumFilter(e.target.value)}
+                className={`${controlBase} border-line bg-card text-ink`}>
+                <option value="">Any medium</option>
+                {mediumOptions.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+            )}
+            {styleOptions.length > 0 && (
+              <select aria-label="Style" value={styleFilter} onChange={e => setStyleFilter(e.target.value)}
+                className={`${controlBase} border-line bg-card text-ink`}>
+                <option value="">Any style</option>
+                {styleOptions.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            )}
             <button onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
               className={`${controlBase} font-medium ${showFavoritesOnly ? 'bg-blue-deep text-cream border-blue-deep' : 'bg-card text-ink border-line hover:bg-sand'}`}>
               ♥ Saved ({favorites.length})

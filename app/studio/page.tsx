@@ -6,7 +6,7 @@ import { supabaseBrowser } from '@/lib/supabase-browser';
 
 type Artist = {
   id: string; name: string; contact: string; mediums: string[]; styles: string[];
-  location: string; price_range: string; turnaround: string; bio: string; portfolio: string; status: string;
+  location: string; price_range: string; turnaround: string; bio: string; portfolio: string; status: string; photo_url?: string | null;
 };
 type Brief = {
   id: string; buyer_name: string; buyer_contact: string; description: string; medium: string;
@@ -19,7 +19,7 @@ type Commission = {
 };
 type Artwork = {
   id: string; title: string; description: string; listing_type: string; medium: string; size: string;
-  price: string; image_url: string; status: string; artists: { name: string } | null;
+  price: string; price_on_request?: boolean | null; image_url: string; status: string; is_featured?: boolean | null; artists: { name: string } | null;
 };
 type Inquiry = {
   id: string; buyer_name: string; buyer_contact: string; message: string; status: string;
@@ -300,6 +300,15 @@ export default function StudioPage() {
               <div>
                 <p className="font-medium">{a.name}</p>
                 <p className="text-xs font-mono text-ink-soft">{a.contact} · Live</p>
+                {a.photo_url && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <img src={a.photo_url} alt="" className="w-10 h-10 rounded-full object-cover border border-line" />
+                    <button className="min-h-11 text-xs underline text-ink-soft hover:text-ink"
+                      onClick={() => act('/api/artists/clear-photo', { artistId: a.id }, 'Could not remove the photo.')}>
+                      Remove photo
+                    </button>
+                  </div>
+                )}
               </div>
               <button className={btnLight}
                 onClick={() => {
@@ -341,7 +350,7 @@ export default function StudioPage() {
                     <p className="font-medium">{a.title}</p>
                     <p className="text-xs text-ink-soft">{a.artists?.name} · {typeLabel(a.listing_type)}</p>
                   </div>
-                  <span className="text-xs font-mono text-ink-soft whitespace-nowrap">{a.price}</span>
+                  <span className="text-xs font-mono text-ink-soft whitespace-nowrap">{a.price_on_request || !a.price ? 'On request' : a.price}</span>
                 </div>
                 <p className="text-sm text-ink-soft mt-2">{[a.medium, a.size].filter(Boolean).join(' · ')}</p>
                 {a.description && <p className="text-sm mt-2">{a.description}</p>}
@@ -373,13 +382,19 @@ export default function StudioPage() {
                     </p>
                     <p className="text-xs text-ink-soft">{a.artists?.name} · {typeLabel(a.listing_type)}</p>
                   </div>
-                  <span className="text-xs font-mono text-ink-soft whitespace-nowrap">{a.price}</span>
+                  <span className="text-xs font-mono text-ink-soft whitespace-nowrap">{a.price_on_request || !a.price ? 'On request' : a.price}</span>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-3">
                   <button className={btnLight}
                     onClick={() => setArtworkStatus(a.id, a.status === 'sold' ? 'approved' : 'sold')}>
                     {a.status === 'sold' ? 'Mark as Available' : 'Mark as Sold'}
                   </button>
+                  {a.status === 'approved' && (
+                    <button className={btnLight}
+                      onClick={() => act('/api/artworks/feature', { artworkId: a.id, featured: !a.is_featured }, 'Could not update this piece.')}>
+                      {a.is_featured ? 'Unfeature' : 'Feature'}
+                    </button>
+                  )}
                   <button className={btnLight} onClick={() => setArtworkStatus(a.id, 'hidden')}>Unpublish</button>
                   <button className={btnDanger} onClick={() => removeArtwork(a)}>Remove</button>
                 </div>

@@ -3,10 +3,21 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { siteUrl } from "@/lib/site-url";
 
 export const metadata: Metadata = {
-  title: "ARTERRA: Your vision. Made original.",
+  metadataBase: new URL(siteUrl()),
+  title: {
+    default: "Arterra: Your vision. Made original.",
+    template: "%s | Arterra",
+  },
   description: "Commission original art from vetted independent artists.",
+  openGraph: {
+    siteName: "Arterra",
+    type: "website",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
