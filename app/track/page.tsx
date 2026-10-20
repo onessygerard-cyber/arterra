@@ -14,12 +14,20 @@ const STEP_LABELS: Record<string, string> = {
 };
 
 type Message = { id: string; from_label: string; text: string; created_at: string };
+type TrackUpdate = {
+  id: string; url: string; caption: string; decision: string; buyer_comment: string; created_at: string;
+};
+type TrackReview = { rating: number; body: string } | null;
 type Commission = {
   id: string; price: string; timeline: string; status: string;
   artists: { name: string } | null;
   commission_messages: Message[];
+  updates: TrackUpdate[];
+  review: TrackReview;
 };
 type Brief = { id: string; buyer_name: string; description: string; status: string; reference_urls?: string[] };
+
+const inputClass = "w-full border border-line rounded-lg px-3 py-2 text-sm bg-cream focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue";
 
 function Stepper({ status }: { status: string }) {
   const current = Math.max(0, STAGES.indexOf(status));
@@ -44,6 +52,15 @@ function Stepper({ status }: { status: string }) {
   );
 }
 
+function Stars({ rating }: { rating: number }) {
+  return (
+    <span role="img" aria-label={`${rating} out of 5 stars`} className="text-gold-deep tracking-wide">
+      {'★'.repeat(rating)}
+      <span className="text-line">{'★'.repeat(5 - rating)}</span>
+    </span>
+  );
+}
+
 function TrackContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -54,6 +71,21 @@ function TrackContent() {
   const [notFound, setNotFound] = useState(false);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [sendError, setSendError] = useState('');
+
+  const [note, setNote] = useState<Record<string, string>>({});
+  const [editing, setEditing] = useState<string | null>(null);
+  const [respondError, setRespondError] = useState<Record<string, string>>({});
+  const [reviewDraft, setReviewDraft] = useState<Record<string, { rating: number; text: string }>>({});
+  const [reviewError, setReviewError] = useState<Record<string, string>>({});
+
+  async function reload() {
+    const res = await fetch('/api/track?token=' + token);
+    if (res.ok) {
+      const data = await res.json();
+      setBrief(data.brief);
+      setCommissions(data.commissions);
+    }
+  }
 
   useEffect(() => {
     async function load() {
@@ -76,17 +108,55 @@ function TrackContent() {
       const res = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ commissionId, trackToken: token, text })
+        body: JSON.stringify({ commissionId, trackToken: token, text }),
       });
       if (!res.ok) { setSendError('Your message could not be sent. Please try again.'); return; }
       setDraft({ ...draft, [commissionId]: '' });
-      const refreshed = await fetch('/api/track?token=' + token);
-      if (refreshed.ok) {
-        const data = await refreshed.json();
-        setCommissions(data.commissions);
-      }
+      await reload();
     } catch {
       setSendError('Your message could not be sent. Check your connection and try again.');
+    }
+  }
+
+  async function respond(updateId: string, decision: 'approved' | 'changes_requested') {
+    setRespondError({ ...respondError, [updateId]: '' });
+    try {
+      const res = await fetch('/api/commission-updates/respond', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trackToken: token, updateId, decision, comment: note[updateId] || '' }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setRespondError({ ...respondError, [updateId]: data.error || 'Your response could not be saved.' });
+        return;
+      }
+      setEditing(null);
+      setNote({ ...note, [updateId]: '' });
+      await reload();
+    } catch {
+      setRespondError({ ...respondError, [updateId]: 'Your response could not be saved. Check your connection and try again.' });
+    }
+  }
+
+  async function submitReview(commissionId: string) {
+    const d = reviewDraft[commissionId] || { rating: 0, text: '' };
+    setReviewError({ ...reviewError, [commissionId]: '' });
+    if (!d.rating) { setReviewError({ ...reviewError, [commissionId]: 'Choose a rating from 1 to 5 stars.' }); return; }
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trackToken: token, commissionId, rating: d.rating, body: d.text }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setReviewError({ ...reviewError, [commissionId]: data.error || 'Your review could not be saved.' });
+        return;
+      }
+      await reload();
+    } catch {
+      setReviewError({ ...reviewError, [commissionId]: 'Your review could not be saved. Check your connection and try again.' });
     }
   }
 
@@ -140,12 +210,78 @@ function TrackContent() {
           const messages = (c.commission_messages || []).slice().sort(
             (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
           );
+          const delivered = c.status === 'delivered';
+          const draftReview = reviewDraft[c.id] || { rating: 0, text: '' };
           return (
             <div key={c.id} className="bg-card border border-line rounded-xl p-6 shadow-sm">
               <p className="font-medium">{c.artists?.name || 'Artist'}</p>
               <p className="text-sm text-ink-soft mb-4">{c.price} · {c.timeline}</p>
 
               <Stepper status={c.status} />
+
+              {c.updates.length > 0 && (
+                <div className="border-t border-line pt-4 mb-5">
+                  <h2 className="text-base mb-3">Progress photos</h2>
+                  <div className="space-y-6">
+                    {c.updates.map(u => {
+                      const decided = u.decision !== 'pending';
+                      const showForm = !delivered && (!decided || editing === u.id);
+                      return (
+                        <div key={u.id}>
+                          <a href={u.url} target="_blank" rel="noreferrer"
+                            aria-label="Open the full size photo in a new tab">
+                            <img src={u.url} alt={u.caption || 'Progress photo'}
+                              className="max-h-72 w-auto max-w-full rounded-lg border border-line" />
+                          </a>
+                          {u.caption && <p className="text-sm mt-2">{u.caption}</p>}
+
+                          {decided && editing !== u.id && (
+                            <div className="mt-2">
+                              <p className="text-sm font-medium">
+                                {u.decision === 'approved' ? 'You approved this photo.' : 'You asked for changes.'}
+                              </p>
+                              {u.buyer_comment && <p className="text-sm text-ink-soft">{u.buyer_comment}</p>}
+                              {!delivered && (
+                                <button
+                                  onClick={() => { setEditing(u.id); setNote({ ...note, [u.id]: u.buyer_comment }); }}
+                                  className="min-h-11 text-sm underline text-ink-soft hover:text-ink">
+                                  Change my response
+                                </button>
+                              )}
+                            </div>
+                          )}
+
+                          {showForm && (
+                            <div className="mt-3 space-y-2">
+                              <textarea rows={2} value={note[u.id] || ''}
+                                onChange={e => setNote({ ...note, [u.id]: e.target.value })}
+                                placeholder="Add a note for the artist (needed if you ask for changes)"
+                                className={inputClass} />
+                              <div className="flex gap-2 flex-wrap">
+                                <button onClick={() => respond(u.id, 'approved')}
+                                  className="min-h-11 bg-ink text-cream px-4 rounded-lg text-sm font-medium hover:bg-brand-deep">
+                                  Approve
+                                </button>
+                                <button onClick={() => respond(u.id, 'changes_requested')}
+                                  className="min-h-11 border border-line bg-card px-4 rounded-lg text-sm font-medium hover:bg-sand">
+                                  Request changes
+                                </button>
+                                {editing === u.id && (
+                                  <button onClick={() => setEditing(null)}
+                                    className="min-h-11 px-3 text-sm text-ink-soft underline hover:text-ink">
+                                    Cancel
+                                  </button>
+                                )}
+                              </div>
+                              {respondError[u.id] && <p className="text-red-600 text-sm">{respondError[u.id]}</p>}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="border-t border-line pt-3 space-y-2 max-h-40 overflow-y-auto mb-3">
                 {messages.length === 0 && <p className="text-sm text-ink-soft/70">No messages yet.</p>}
@@ -169,6 +305,54 @@ function TrackContent() {
                 </button>
               </div>
               {sendError && <p className="text-red-600 text-sm mt-2">{sendError}</p>}
+
+              {delivered && (
+                <div className="border-t border-line pt-4 mt-5">
+                  {c.review ? (
+                    <>
+                      <h2 className="text-base mb-1">Your review</h2>
+                      <Stars rating={c.review.rating} />
+                      {c.review.body && <p className="text-sm mt-2">{c.review.body}</p>}
+                      <p className="text-xs text-ink-soft mt-2">
+                        Shown on {c.artists?.name || 'the artist'}&apos;s public profile with your first name.
+                      </p>
+                    </>
+                  ) : (
+                    <form onSubmit={e => { e.preventDefault(); submitReview(c.id); }} className="space-y-3">
+                      <h2 className="text-base">How did it go?</h2>
+                      <fieldset>
+                        <legend className="sr-only">Rating</legend>
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map(n => (
+                            <label key={n}
+                              className="w-11 h-11 flex items-center justify-center cursor-pointer rounded-lg focus-within:ring-2 focus-within:ring-blue/40">
+                              <input type="radio" name={`rating-${c.id}`} value={n}
+                                checked={draftReview.rating === n}
+                                onChange={() => setReviewDraft({ ...reviewDraft, [c.id]: { ...draftReview, rating: n } })}
+                                className="sr-only" />
+                              <span aria-hidden="true"
+                                className={`text-3xl ${draftReview.rating >= n ? 'text-gold-deep' : 'text-line'}`}>★</span>
+                              <span className="sr-only">{n} {n === 1 ? 'star' : 'stars'}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+                      <textarea rows={3} value={draftReview.text} maxLength={2000}
+                        onChange={e => setReviewDraft({ ...reviewDraft, [c.id]: { ...draftReview, text: e.target.value } })}
+                        placeholder="Tell others about your experience (optional)"
+                        className={inputClass} />
+                      <p className="text-xs text-ink-soft">
+                        Your first name and review will be shown on {c.artists?.name || 'the artist'}&apos;s public profile.
+                      </p>
+                      {reviewError[c.id] && <p className="text-red-600 text-sm">{reviewError[c.id]}</p>}
+                      <button type="submit"
+                        className="min-h-11 bg-ink text-cream px-5 rounded-lg text-sm font-medium hover:bg-brand-deep">
+                        Post review
+                      </button>
+                    </form>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

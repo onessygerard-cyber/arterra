@@ -6,6 +6,7 @@ import Link from 'next/link';
 import FadeImage from '@/components/FadeImage';
 import Avatar from '@/components/Avatar';
 import ShareLinks from '@/components/ShareLinks';
+import ReviewsSection, { type Review } from '@/components/ReviewsSection';
 
 type Artist = {
   id: string; name: string; location: string; bio: string; price_range: string;
@@ -44,6 +45,7 @@ export default function ArtistProfilePage() {
 
   const [artist, setArtist] = useState<Artist | null>(null);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -63,6 +65,7 @@ export default function ArtistProfilePage() {
       const data = await res.json();
       setArtist(data.artist);
       setArtworks(data.artworks);
+      setReviews(data.reviews || []);
       const pieceId = new URLSearchParams(window.location.search).get('piece');
       const match = (data.artworks as Artwork[]).find(x => x.id === pieceId);
       if (match) setDetail(match);
@@ -236,6 +239,8 @@ export default function ArtistProfilePage() {
           </button>
         ))}
       </div>
+
+      <ReviewsSection reviews={reviews} />
 
       {detail && (
         <div className="fixed inset-0 bg-ink/50 backdrop-blur-sm z-50 overflow-y-auto" onClick={() => setDetail(null)}>

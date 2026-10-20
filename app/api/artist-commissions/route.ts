@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { signReferenceImages } from '@/lib/signed-urls';
+import { loadUpdates } from '@/lib/commission-updates';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -12,7 +13,6 @@ export async function GET(request: Request) {
 
   const { data: artist } = await supabaseAdmin
     .from('artists').select('*').eq('user_id', userData.user.id).maybeSingle();
-
   if (!artist) return NextResponse.json({ error: 'No linked artist profile' }, { status: 404 });
 
   const { data: commissions, error } = await supabaseAdmin
@@ -20,15 +20,18 @@ export async function GET(request: Request) {
     .select('*, briefs(buyer_name, description, reference_images), commission_messages(id, from_label, text, created_at)')
     .eq('artist_id', artist.id)
     .order('updated_at', { ascending: false });
-
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const withImages = await Promise.all(
-    (commissions || []).map(async (c: { briefs?: { reference_images?: string[] | null } | null }) => ({
+  const list = commissions || [];
+  const updates = await loadUpdates(list.map((c: { id: string }) => c.id));
+
+  const withExtras = await Promise.all(
+    list.map(async (c: { id: string; briefs?: { reference_images?: string[] | null } | null }) => ({
       ...c,
       reference_urls: await signReferenceImages(c.briefs?.reference_images),
+      updates: updates[c.id] || [],
     }))
   );
 
-  return NextResponse.json({ commissions: withImages });
+  return NextResponse.json({ commissions: withExtras });
 }

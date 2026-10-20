@@ -1,10 +1,12 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { NextResponse } from 'next/server';
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-  if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+  const id = searchParams.get('id') || '';
+  if (!UUID.test(id)) return NextResponse.json({ error: 'Artist not found' }, { status: 404 });
 
   const { data: artist, error: artistError } = await supabaseAdmin
     .from('artists')
@@ -13,12 +15,23 @@ export async function GET(request: Request) {
     .eq('status', 'verified')
     .maybeSingle();
 
-  if (artistError) return NextResponse.json({ error: artistError.message }, { status: 500 });
+  if (artistError) return NextResponse.json({ error: 'Something went wrong.' }, { status: 500 });
   if (!artist) return NextResponse.json({ error: 'Artist not found' }, { status: 404 });
 
   const { data: artworks } = await supabaseAdmin
-    .from('artworks').select('*').eq('artist_id', id).in('status', ['approved', 'sold'])
+    .from('artworks')
+    .select('*')
+    .eq('artist_id', id)
+    .in('status', ['approved', 'sold'])
     .order('created_at', { ascending: false });
 
-  return NextResponse.json({ artist, artworks: artworks || [] });
+  const { data: reviews } = await supabaseAdmin
+    .from('reviews')
+    .select('rating, body, display_name, created_at')
+    .eq('artist_id', id)
+    .eq('status', 'published')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  return NextResponse.json({ artist, artworks: artworks || [], reviews: reviews || [] });
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-browser';
+import CommissionUpdates, { type CommissionUpdate } from '@/components/CommissionUpdates';
 
 type Artist = { id: string; name: string };
 type Artwork = {
@@ -18,6 +19,7 @@ type Commission = {
   briefs: { buyer_name: string; description: string } | null;
   commission_messages: Message[];
   reference_urls?: string[];
+  updates?: CommissionUpdate[];
 };
 
 const STAGE_LABELS: Record<string, string> = {
@@ -307,6 +309,8 @@ export default function ArtistDashboard() {
                     </div>
                   </div>
                 )}
+
+                <CommissionUpdates commissionId={c.id} status={c.status} updates={c.updates || []} onChanged={loadCommissions} />
 
                 <div className="border-t border-line pt-3 space-y-2 max-h-40 overflow-y-auto mb-3">
                   {messages.length === 0 && <p className="text-sm text-ink-soft/70">No messages yet.</p>}

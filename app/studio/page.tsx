@@ -185,6 +185,7 @@ export default function StudioPage() {
     <main className="max-w-4xl mx-auto mt-16 px-6 pb-24">
       <h1 className="text-2xl mb-6">Studio</h1>
       <a href="/studio/artists" className="block -mt-2 mb-6 text-sm underline text-blue-deep">Manage artist logins</a>
+      <a href="/studio/moderation" className="block -mt-4 mb-6 text-sm underline text-blue-deep">Reviews and progress updates</a>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-12">
         {[
