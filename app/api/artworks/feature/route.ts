@@ -15,8 +15,8 @@ export async function POST(request: Request) {
   if (featured) {
     const { data: artwork } = await supabaseAdmin
       .from('artworks').select('status').eq('id', artworkId).maybeSingle();
-    if (!artwork || artwork.status !== 'approved') {
-      return NextResponse.json({ error: 'Only live, available pieces can be featured.' }, { status: 400 });
+    if (!artwork || !['approved', 'sold'].includes(artwork.status)) {
+      return NextResponse.json({ error: 'Only live pieces can be featured.' }, { status: 400 });
     }
   }
 

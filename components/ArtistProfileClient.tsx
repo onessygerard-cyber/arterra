@@ -6,6 +6,7 @@ import Link from 'next/link';
 import FadeImage from '@/components/FadeImage';
 import Avatar from '@/components/Avatar';
 import ShareLinks from '@/components/ShareLinks';
+import AvailabilityMark from '@/components/AvailabilityMark';
 import ReviewsSection, { type Review } from '@/components/ReviewsSection';
 
 type Artist = {
@@ -232,8 +233,9 @@ export default function ArtistProfilePage() {
             <span className="block text-xs text-ink-soft mt-1">{typeLabel(a.listing_type)}</span>
             <span className="block text-sm font-medium mt-2">
               {priceLabel(a)}
+              {a.status === 'approved' && <AvailabilityMark status="approved" className="ml-2 align-middle" />}
               {a.status === 'sold' && (
-                <span className="ml-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ink text-cream align-middle">Sold</span>
+                <AvailabilityMark status="sold" className="ml-2 align-middle" />
               )}
             </span>
           </button>
@@ -286,8 +288,9 @@ export default function ArtistProfilePage() {
 
                 <p className="font-mono text-lg mb-5">
                   {priceLabel(detail)}
+                  {detail.status === 'approved' && <AvailabilityMark status="approved" className="ml-3 align-middle" />}
                   {detail.status === 'sold' && (
-                    <span className="ml-3 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ink text-cream align-middle">Sold</span>
+                    <AvailabilityMark status="sold" className="ml-3 align-middle" />
                   )}
                 </p>
 

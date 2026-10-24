@@ -390,7 +390,7 @@ export default function StudioPage() {
                     onClick={() => setArtworkStatus(a.id, a.status === 'sold' ? 'approved' : 'sold')}>
                     {a.status === 'sold' ? 'Mark as Available' : 'Mark as Sold'}
                   </button>
-                  {a.status === 'approved' && (
+                  {(a.status === 'approved' || a.status === 'sold') && (
                     <button className={btnLight}
                       onClick={() => act('/api/artworks/feature', { artworkId: a.id, featured: !a.is_featured }, 'Could not update this piece.')}>
                       {a.is_featured ? 'Unfeature' : 'Feature'}

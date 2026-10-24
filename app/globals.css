@@ -4,9 +4,10 @@
   --color-cream: #F1ECE2;
   --color-sand: #E7DFCE;
   --color-ink: #2E1416;
-  --color-ink-soft: #5B5147;
-  --color-line: #D9CFBC;
+  --color-ink-soft: #4B403B;
+  --color-line: #CDBFA8;
   --color-card: #FBF9F3;
+  --color-night: #1F0D10;
   --color-blue: #2C4A7C;
   --color-blue-deep: #263554;
   --color-gold: #FBCD0D;
@@ -24,6 +25,7 @@
 
 body {
   background-color: var(--color-cream);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .18 0 0 0 0 .08 0 0 0 0 .09 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   color: var(--color-ink);
   font-family: var(--font-sans);
 }
@@ -31,6 +33,15 @@ body {
 h1, h2, h3 {
   font-family: var(--font-display);
   font-weight: 600;
+}
+
+h1 {
+  letter-spacing: -0.015em;
+}
+
+::selection {
+  background: var(--color-brand);
+  color: var(--color-cream);
 }
 
 input, select, textarea {

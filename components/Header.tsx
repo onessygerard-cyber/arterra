@@ -1,14 +1,12 @@
-import Image from "next/image";
-import Link from "next/link";
-
-const navLink =
-  "inline-flex items-center min-h-11 text-sm font-medium px-3 rounded-full hover:bg-sand text-ink-soft hover:text-ink";
+import Image from 'next/image';
+import Link from 'next/link';
+import NavLinks from '@/components/NavLinks';
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-20 bg-cream/90 backdrop-blur border-b border-line">
-      <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between flex-wrap gap-3">
-        <Link href="/" aria-label="ARTERRA home">
+    <header className="sticky top-0 z-30 bg-cream/90 backdrop-blur border-b border-line">
+      <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between flex-wrap gap-x-6 gap-y-1">
+        <Link href="/" aria-label="ARTERRA home" className="shrink-0">
           <Image
             src="/arterra-logo.png"
             alt="ARTERRA"
@@ -18,15 +16,7 @@ export default function Header() {
             className="h-12 md:h-14 w-auto"
           />
         </Link>
-        <nav className="flex items-center gap-1 flex-wrap">
-          <Link href="/explore" className={navLink}>Explore</Link>
-          <Link href="/commission" className={navLink}>Commission</Link>
-          <Link href="/join" className={navLink}>Register</Link>
-          <Link href="/artist-login" className={navLink}>Artist Login</Link>
-          <Link href="/studio" className="inline-flex items-center min-h-11 text-xs font-medium px-3 rounded-full text-ink-soft/70 hover:text-ink-soft">
-            Studio
-          </Link>
-        </nav>
+        <NavLinks />
       </div>
     </header>
   );

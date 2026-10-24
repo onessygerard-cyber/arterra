@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import FadeImage from '@/components/FadeImage';
 import Avatar from '@/components/Avatar';
+import AvailabilityMark from '@/components/AvailabilityMark';
 
 type Artist = {
   id: string; name: string; location: string; mediums: string[]; styles: string[];
@@ -313,8 +314,9 @@ export default function ExplorePage() {
                       </span>
                       <span className="block text-sm font-medium mt-2">
                         {priceLabel(a)}
+                        {a.status === 'approved' && <AvailabilityMark status="approved" className="ml-2 align-middle" />}
                         {a.status === 'sold' && (
-                          <span className="ml-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ink text-cream align-middle">Sold</span>
+                          <AvailabilityMark status="sold" className="ml-2 align-middle" />
                         )}
                       </span>
                     </Link>

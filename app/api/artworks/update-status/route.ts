@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   }
 
   const update =
-    body.status === 'approved'
+    ['approved', 'sold'].includes(body.status)
       ? { status: body.status }
       : { status: body.status, is_featured: false };
 
