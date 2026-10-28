@@ -7,6 +7,7 @@ import FadeImage from '@/components/FadeImage';
 import Avatar from '@/components/Avatar';
 import ShareLinks from '@/components/ShareLinks';
 import AvailabilityMark from '@/components/AvailabilityMark';
+import { pillClass } from '@/lib/pill';
 import ReviewsSection, { type Review } from '@/components/ReviewsSection';
 
 type Artist = {
@@ -198,9 +199,9 @@ export default function ArtistProfilePage() {
         Artwork <span className="font-mono text-sm text-ink-soft font-normal">({filtered.length})</span>
       </h2>
 
-      <div role="group" aria-label="Filter artwork" className="flex gap-x-7 border-b border-line mb-10">
+      <div role="group" aria-label="Filter artwork" className="flex flex-wrap gap-2 mb-10">
         {([['all', 'All'], ['original', 'Originals'], ['print', 'Prints']] as const).map(([t, label]) => (
-          <button key={t} onClick={() => setFilter(t)} aria-pressed={filter === t} className={tabClass(filter === t)}>
+          <button key={t} onClick={() => setFilter(t)} aria-pressed={filter === t} className={pillClass(filter === t)}>
             {label}
           </button>
         ))}

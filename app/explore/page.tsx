@@ -5,6 +5,8 @@ import Link from 'next/link';
 import FadeImage from '@/components/FadeImage';
 import Avatar from '@/components/Avatar';
 import AvailabilityMark from '@/components/AvailabilityMark';
+import PillSelect from '@/components/PillSelect';
+import { pillClass } from '@/lib/pill';
 
 type Artist = {
   id: string; name: string; location: string; mediums: string[]; styles: string[];
@@ -65,21 +67,12 @@ function priceLabel(a: { price: string; price_on_request: boolean | null }): str
   return onRequest(a) ? 'Price on request' : a.price;
 }
 
-const tabClass = (active: boolean) =>
-  `min-h-11 px-1 text-sm font-medium border-b-2 -mb-px transition-colors ${
-    active ? 'border-blue-deep text-ink' : 'border-transparent text-ink-soft hover:text-ink'
-  }`;
-
-const controlBase =
-  'min-h-11 text-sm border rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue';
-
 function EmptyState({ message, onReset }: { message: string; onReset?: () => void }) {
   return (
     <div className="border border-dashed border-line rounded-xl p-10 text-center text-ink-soft bg-card/50">
       <p>{message}</p>
       {onReset && (
-        <button onClick={onReset}
-          className="mt-4 min-h-11 px-5 rounded-lg border border-line bg-card text-sm font-medium text-ink hover:bg-sand">
+        <button onClick={onReset} className={`mt-4 ${pillClass(false)}`}>
           Reset filters
         </button>
       )}
@@ -178,9 +171,9 @@ export default function ExplorePage() {
         <div className="h-7 w-48 bg-sand rounded motion-safe:animate-pulse mb-3" />
         <div className="h-4 w-24 bg-sand rounded motion-safe:animate-pulse mb-8" />
         <div className="h-11 bg-sand rounded-lg motion-safe:animate-pulse mb-5" />
-        <div className="flex gap-7 mb-8">
+        <div className="flex gap-2 mb-8">
           {[0, 1, 2, 3].map(i => (
-            <div key={i} className="h-6 w-16 bg-sand rounded motion-safe:animate-pulse" />
+            <div key={i} className="h-11 w-24 bg-sand rounded-full motion-safe:animate-pulse" />
           ))}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -209,11 +202,11 @@ export default function ExplorePage() {
           className="w-full min-h-11 border border-line rounded-lg pl-11 pr-4 py-2.5 bg-card focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue" />
       </div>
 
-      <div role="group" aria-label="Browse" className="flex flex-wrap gap-x-7 border-b border-line mb-10">
+      <div role="group" aria-label="Browse" className="flex flex-wrap gap-2 mb-8">
         {([
           ['artists', 'Artists'], ['all', 'All Art'], ['original', 'Originals'], ['print', 'Prints']
         ] as const).map(([v, label]) => (
-          <button key={v} onClick={() => setView(v)} aria-pressed={view === v} className={tabClass(view === v)}>
+          <button key={v} onClick={() => setView(v)} aria-pressed={view === v} className={pillClass(view === v)}>
             {label}
           </button>
         ))}
@@ -251,35 +244,31 @@ export default function ExplorePage() {
       ) : (
         <>
           <div className="flex gap-2 mb-8 flex-wrap">
-            <select aria-label="Sort" value={sort} onChange={e => setSort(e.target.value as Sort)}
-              className={`${controlBase} border-line bg-card text-ink`}>
+            <PillSelect label="Sort" value={sort} onChange={v => setSort(v as Sort)}>
               <option value="newest">Newest first</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
-            </select>
-            <select aria-label="Price range" value={priceRange} onChange={e => setPriceRange(e.target.value as PriceRange)}
-              className={`${controlBase} border-line bg-card text-ink`}>
+            </PillSelect>
+            <PillSelect label="Price range" value={priceRange} onChange={v => setPriceRange(v as PriceRange)}>
               <option value="all">Any price</option>
               <option value="under100">Under $100</option>
               <option value="100-500">$100–$500</option>
               <option value="over500">$500+</option>
-            </select>
+            </PillSelect>
             {mediumOptions.length > 0 && (
-              <select aria-label="Medium" value={mediumFilter} onChange={e => setMediumFilter(e.target.value)}
-                className={`${controlBase} border-line bg-card text-ink`}>
+              <PillSelect label="Medium" value={mediumFilter} onChange={setMediumFilter}>
                 <option value="">Any medium</option>
                 {mediumOptions.map(m => <option key={m} value={m}>{m}</option>)}
-              </select>
+              </PillSelect>
             )}
             {styleOptions.length > 0 && (
-              <select aria-label="Style" value={styleFilter} onChange={e => setStyleFilter(e.target.value)}
-                className={`${controlBase} border-line bg-card text-ink`}>
+              <PillSelect label="Style" value={styleFilter} onChange={setStyleFilter}>
                 <option value="">Any style</option>
                 {styleOptions.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+              </PillSelect>
             )}
             <button onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-              className={`${controlBase} font-medium ${showFavoritesOnly ? 'bg-blue-deep text-cream border-blue-deep' : 'bg-card text-ink border-line hover:bg-sand'}`}>
+              aria-pressed={showFavoritesOnly} className={pillClass(showFavoritesOnly)}>
               ♥ Saved ({favorites.length})
             </button>
           </div>
@@ -315,9 +304,7 @@ export default function ExplorePage() {
                       <span className="block text-sm font-medium mt-2">
                         {priceLabel(a)}
                         {a.status === 'approved' && <AvailabilityMark status="approved" className="ml-2 align-middle" />}
-                        {a.status === 'sold' && (
-                          <AvailabilityMark status="sold" className="ml-2 align-middle" />
-                        )}
+                        {a.status === 'sold' && <AvailabilityMark status="sold" className="ml-2 align-middle" />}
                       </span>
                     </Link>
                     <button onClick={() => setFavorites(toggleFavorite(a.id))}
