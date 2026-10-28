@@ -9,7 +9,7 @@ type ReviewRow = {
   created_at: string; artists: { name: string } | null;
 };
 type UpdateRow = {
-  id: string; url: string; caption: string; decision: string; buyer_comment: string; created_at: string;
+  id: string; url: string; caption: string; decision: string; buyer_comment: string; created_at: string; stage?: string;
   commissions: { briefs: { buyer_name: string } | null; artists: { name: string } | null } | null;
 };
 
@@ -137,6 +137,7 @@ export default function ModerationPage() {
                 <p className="text-sm font-medium">
                   {u.commissions?.artists?.name || 'Artist'} for {u.commissions?.briefs?.buyer_name || 'buyer'}
                 </p>
+                {u.stage && <p className="text-xs font-mono text-ink-soft">{u.stage}</p>}
                 {u.caption && <p className="text-sm">{u.caption}</p>}
                 <p className="text-xs text-ink-soft mt-1">
                   {DECISION_LABEL[u.decision] || u.decision} · {new Date(u.created_at).toLocaleDateString()}

@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { requireArtist } from '@/lib/require-artist';
 import { rateLimited } from '@/lib/rate-limit';
+import { isStage, STAGE_LABEL } from '@/lib/stages';
 import { NextResponse } from 'next/server';
 
 const TYPES: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
@@ -19,10 +20,16 @@ export async function POST(request: Request) {
   const form = await request.formData();
   const commissionId = String(form.get('commissionId') || '');
   const caption = String(form.get('caption') || '').trim().slice(0, 300);
+  const stageRaw = String(form.get('stage') || '');
   const file = form.get('file') as File | null;
+
   if (!commissionId || !file) {
     return NextResponse.json({ error: 'Choose a photo first.' }, { status: 400 });
   }
+  if (!isStage(stageRaw)) {
+    return NextResponse.json({ error: 'Choose what kind of photo this is.' }, { status: 400 });
+  }
+  const stage = stageRaw;
 
   const { data: commission } = await supabaseAdmin
     .from('commissions')
@@ -64,16 +71,18 @@ export async function POST(request: Request) {
 
   const { error } = await supabaseAdmin
     .from('commission_updates')
-    .insert({ commission_id: commission.id, image_path: path, caption });
+    .insert({ commission_id: commission.id, image_path: path, caption, stage });
   if (error) {
     await supabaseAdmin.storage.from('brief-references').remove([path]);
     return NextResponse.json({ error: 'The photo could not be saved.' }, { status: 500 });
   }
 
+  const what =
+    stage === 'update' ? 'Added a progress photo' : `Added the ${STAGE_LABEL[stage].toLowerCase()} for review`;
   await supabaseAdmin.from('commission_messages').insert({
     commission_id: commission.id,
     from_label: auth.artist.name,
-    text: caption ? `Added a progress photo: ${caption}` : 'Added a progress photo.',
+    text: caption ? `${what}: ${caption}` : `${what}.`,
   });
 
   return NextResponse.json({ success: true });

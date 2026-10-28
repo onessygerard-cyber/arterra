@@ -8,6 +8,7 @@ export type PublicUpdate = {
   decision: string;
   buyer_comment: string;
   created_at: string;
+  stage: string;
 };
 
 type Row = {
@@ -17,6 +18,7 @@ type Row = {
   caption: string;
   decision: string;
   buyer_comment: string;
+  stage: string;
   created_at: string;
 };
 
@@ -26,7 +28,7 @@ export async function loadUpdates(commissionIds: string[]): Promise<Record<strin
 
   const { data } = await supabaseAdmin
     .from('commission_updates')
-    .select('id, commission_id, image_path, caption, decision, buyer_comment, created_at')
+    .select('id, commission_id, image_path, caption, decision, buyer_comment, stage, created_at')
     .in('commission_id', commissionIds)
     .order('created_at', { ascending: true });
 
@@ -42,6 +44,7 @@ export async function loadUpdates(commissionIds: string[]): Promise<Record<strin
       decision: r.decision,
       buyer_comment: r.buyer_comment,
       created_at: r.created_at,
+      stage: r.stage,
     });
   }
   return result;

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase-browser';
+import { STAGES, STAGE_LABEL, type Stage } from '@/lib/stages';
+import RevisionRounds from '@/components/RevisionRounds';
 
 export type CommissionUpdate = {
   id: string;
@@ -10,6 +12,7 @@ export type CommissionUpdate = {
   decision: string;
   buyer_comment: string;
   created_at: string;
+  stage: string;
 };
 
 const MAX_BYTES = 4 * 1024 * 1024;
@@ -37,6 +40,7 @@ export default function CommissionUpdates({
   onChanged: () => void | Promise<void>;
 }) {
   const [caption, setCaption] = useState('');
+  const [stage, setStage] = useState<Stage | ''>('');
   const [file, setFile] = useState<File | null>(null);
   const [inputKey, setInputKey] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -63,12 +67,14 @@ export default function CommissionUpdates({
 
   async function upload(e: React.FormEvent) {
     e.preventDefault();
+    if (!stage) { setError('Choose what kind of photo this is.'); return; }
     if (!file) { setError('Choose a photo first.'); return; }
     setBusy(true);
     setError('');
     const form = new FormData();
     form.append('commissionId', commissionId);
     form.append('caption', caption);
+    form.append('stage', stage);
     form.append('file', file);
     const res = await fetch('/api/commission-updates', {
       method: 'POST',
@@ -80,6 +86,7 @@ export default function CommissionUpdates({
     if (!res.ok) { setError(data.error || 'The photo could not be uploaded.'); return; }
     setFile(null);
     setCaption('');
+    setStage('');
     setInputKey(k => k + 1);
     await onChanged();
   }
@@ -99,16 +106,24 @@ export default function CommissionUpdates({
     await onChanged();
   }
 
+  const fieldClass =
+    'w-full min-h-11 border border-line rounded-lg px-3 py-2 text-sm bg-cream focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue';
+
   return (
     <div className="border-t border-line pt-4 mb-4">
       <p className="text-sm font-medium mb-3">
         Progress photos <span className="font-mono text-xs text-ink-soft font-normal">({updates.length})</span>
       </p>
 
+      {status !== 'proposed' && <RevisionRounds updates={updates} />}
+
       {updates.length > 0 && (
         <div className="flex gap-4 flex-wrap mb-4">
           {updates.map(u => (
             <div key={u.id} className="w-40">
+              <p className="font-mono text-[11px] text-ink-soft mb-1">
+                {STAGE_LABEL[u.stage as Stage] || 'Progress update'}
+              </p>
               <a href={u.url} target="_blank" rel="noreferrer">
                 <img src={u.url} alt={u.caption || 'Progress photo'}
                   className="w-40 h-40 object-cover rounded-lg border border-line" />
@@ -133,13 +148,22 @@ export default function CommissionUpdates({
 
       {canAdd ? (
         <form onSubmit={upload} className="space-y-2">
+          <select value={stage} onChange={e => setStage(e.target.value as Stage | '')} className={fieldClass}>
+            <option value="">Choose the photo type</option>
+            {STAGES.map(s => (
+              <option key={s} value={s}>{STAGE_LABEL[s]}</option>
+            ))}
+          </select>
+          <p className="text-xs text-ink-soft">
+            Concept, sketch and preliminary colours each give the buyer one included round of changes, so label
+            them honestly.
+          </p>
           <input key={inputKey} type="file" accept="image/jpeg,image/png,image/webp"
             onChange={pick} className="w-full text-sm" />
           <input placeholder="Caption, e.g. Underpainting finished" value={caption} maxLength={300}
-            onChange={e => setCaption(e.target.value)}
-            className="w-full min-h-11 border border-line rounded-lg px-3 py-2 text-sm bg-cream focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue" />
+            onChange={e => setCaption(e.target.value)} className={fieldClass} />
           {error && <p className="text-red-600 text-sm">{error}</p>}
-          <button type="submit" disabled={busy || !file}
+          <button type="submit" disabled={busy || !file || !stage}
             className="min-h-11 bg-ink text-cream px-4 rounded-lg text-sm font-medium hover:bg-brand-deep disabled:opacity-50">
             {busy ? 'Uploading…' : 'Add progress photo'}
           </button>
