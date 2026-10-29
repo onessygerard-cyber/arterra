@@ -6,11 +6,12 @@ import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 import { pill, pillCta, pillIdle, pillOn } from '@/lib/pill';
 
-const ARTIST_AREA = /^\/artist\/(dashboard|profile|password)(\/|$)/;
+const ARTIST_AREA = /^\/artist\/(dashboard|profile|password|experiences)(\/|$)/;
 
 function sectionOf(pathname: string): string {
   if (pathname.startsWith('/explore')) return 'explore';
   if (pathname.startsWith('/commission')) return 'commission';
+  if (pathname.startsWith('/experiences')) return 'experiences';
   if (pathname.startsWith('/join')) return 'join';
   if (pathname.startsWith('/artist-login') || ARTIST_AREA.test(pathname)) return 'login';
   if (pathname.startsWith('/artist/')) return 'explore';
@@ -76,6 +77,7 @@ export default function NavLinks() {
     <nav aria-label="Main" className="flex flex-wrap items-center gap-2">
       {item('explore', '/explore', 'Explore')}
       {item('commission', '/commission', 'Commission')}
+      {item('experiences', '/experiences', 'Experiences')}
       {item('login', '/artist-login', 'Artist Login')}
       {isAdmin && (
         <>

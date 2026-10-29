@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
           '/submit-artwork',
           '/artist-login',
           '/artist/dashboard',
-          '/artist/profile',
+          '/artist/profile',\n          '/artist/experiences',\n          '/experiences/booking',
           '/artist/password',
         ],
       },

@@ -219,6 +219,9 @@ export default function ArtistDashboard() {
           <Link href="/artist/profile" className="min-h-11 inline-flex items-center text-sm border border-line px-4 rounded-full hover:bg-sand">
             Edit Profile
           </Link>
+          <Link href="/artist/experiences" className="min-h-11 inline-flex items-center text-sm border border-line px-4 rounded-full hover:bg-sand">
+            My Experiences
+          </Link>
           <Link href="/artist/password" className="min-h-11 inline-flex items-center text-sm border border-line px-4 rounded-full hover:bg-sand">
             Change Password
           </Link>

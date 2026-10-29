@@ -29,6 +29,8 @@ export const privacyDoc: LegalDoc = {
       bullets: [
         "When you request a commission: your name, email or WhatsApp number, a description of what you want, art type, style, size, budget, deadline, delivery location, optional notes, and any reference images you upload.",
         "When you ask about an artwork: your name, contact details and message.",
+        "When you ask for a place at an experience: your name, contact details, the number of seats and an optional message.",
+        "When you send a private-event enquiry: your name, contact details, your organisation, group size, preferred date, location, budget and what you have in mind.",
         "When you apply as an artist: your name, contact details, location, biography, portfolio description, price range, turnaround time, and the art types you work in.",
         "If we ask you to verify your identity: the identity details and supporting documents you send us. [[OWNER: how identity documents are stored and how long they are kept.]]",
         "When you have an artist login: your login email and a password, which is stored only in a scrambled (hashed) form by our authentication provider, plus any profile photo, artwork images and details you add.",
@@ -61,6 +63,7 @@ export const privacyDoc: LegalDoc = {
         "Everyone: an approved artist's public profile (name, location, biography, photo if added, art types, price range, turnaround and shipping details), their approved artwork, and published reviews with the buyer's first name and last initial.",
         "A matched artist: the buyer's name, the request details, reference images, messages and responses to progress photos. We do not give the artist the buyer's contact details.",
         "A buyer: the matched artist's name, the agreed price and timeline, progress photos and messages.",
+        "An experience host: the names and seat counts of confirmed attendees. We do not give hosts attendees' contact details. The exact address or joining link is shown only to confirmed attendees, using their private link.",
         "The ARTERRA team: all of the information above, including contact details, so that we can run the service.",
       ],
       paragraphs: [
@@ -92,6 +95,7 @@ export const privacyDoc: LegalDoc = {
       heading: "6. How long we keep it",
       bullets: [
         "Spam-limit records: deleted automatically, normally within a day or two.",
+        "[[OWNER AND LAWYER: how long experience reservations and private-event enquiries are kept after the event.]]",
         "[[OWNER AND LAWYER: how long commission records, messages, reference images and progress photos are kept after a commission ends.]]",
         "[[OWNER AND LAWYER: how long records of rejected artist applications are kept.]]",
       ],

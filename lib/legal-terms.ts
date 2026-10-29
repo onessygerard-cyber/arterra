@@ -121,6 +121,21 @@ export const termsDoc: LegalDoc = {
       ],
     },
     {
+      heading: "13. Experiences, workshops and private events",
+      paragraphs: [
+        "13.1 An experience is a workshop, class or live session led by a participating artist (the host). Asking for a place is a request. A place is reserved only when Arterra confirms it.",
+        "13.2 [[OWNER: how attendees pay for an experience, when payment is due, and who receives it.]]",
+        "13.3 The exact address or joining link for an experience is shared only with confirmed attendees.",
+        "13.4 Hosts must describe the experience accurately, run it as described, and keep attendees safe. [[LAWYER: host responsibilities, insurance and venue permissions.]]",
+        "13.5 An experience may be changed or cancelled if too few people book, if the host or venue is unavailable, or for safety reasons. [[OWNER: the minimum-attendance rule, how much notice Arterra gives, and the refund or credit that follows.]]",
+        "13.6 [[OWNER AND LAWYER: when an attendee can cancel, and what they get back.]]",
+        "13.7 Attendees must follow the reasonable instructions of the host and the venue and respect other participants. [[LAWYER: what applies to injury, loss or damage, and to materials and equipment.]]",
+        "13.8 [[OWNER AND LAWYER: whether attendees may be photographed or recorded, and how consent is handled.]]",
+        "13.9 [[OWNER AND LAWYER: the minimum age, and whether children may attend with an adult.]]",
+        "13.10 A private-event enquiry is not a booking. A private event is confirmed only when Arterra and the client agree the date, place, price and terms in writing. [[OWNER: the host's fee and Arterra's share for experiences and private events, whether a fixed fee or a share, and who pays for the venue and materials.]]",
+      ],
+    },
+    {
       heading: "Customer support and notices",
       paragraphs: [
         "[[SUPPORT EMAIL]] | [[SUPPORT TELEPHONE]] | [[FULL RWANDA OFFICE ADDRESS]]",
