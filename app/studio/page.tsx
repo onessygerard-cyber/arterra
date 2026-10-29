@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 
 type Artist = {
+  agreement_signed_on?: string | null;
   id: string; name: string; contact: string; mediums: string[]; styles: string[];
   location: string; price_range: string; turnaround: string; bio: string; portfolio: string; status: string; photo_url?: string | null;
 };
@@ -185,6 +186,7 @@ export default function StudioPage() {
     <main className="max-w-4xl mx-auto mt-16 px-6 pb-24">
       <h1 className="text-2xl mb-6">Studio</h1>
       <a href="/studio/artists" className="block -mt-2 mb-6 text-sm underline text-blue-deep">Manage artist logins</a>
+      <a href="/studio/agreements" className="block -mt-4 mb-6 text-sm underline text-blue-deep">Artist agreements</a>
       <a href="/studio/experiences" className="block -mt-4 mb-6 text-sm underline text-blue-deep">Experiences</a>
       <a href="/studio/moderation" className="block -mt-4 mb-6 text-sm underline text-blue-deep">Reviews and progress updates</a>
 
@@ -249,7 +251,11 @@ export default function StudioPage() {
                       <select className={inputClass} value={matchArtist[b.id] || ''}
                         onChange={e => setMatchArtist({ ...matchArtist, [b.id]: e.target.value })}>
                         <option value="">Choose an artist…</option>
-                        {verifiedArtists.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                        {verifiedArtists.map(a => (
+                          <option key={a.id} value={a.id}>
+                            {a.name}{a.agreement_signed_on ? '' : ' (agreement not signed)'}
+                          </option>
+                        ))}
                       </select>
                       <input placeholder="Quoted price, e.g. $650" className={inputClass}
                         value={matchPrice[b.id] || ''}
@@ -301,7 +307,7 @@ export default function StudioPage() {
             <div key={a.id} className={`${card} flex justify-between items-center gap-3`}>
               <div>
                 <p className="font-medium">{a.name}</p>
-                <p className="text-xs font-mono text-ink-soft">{a.contact} · Live</p>
+                <p className="text-xs font-mono text-ink-soft">{a.contact} · Live{a.agreement_signed_on ? ' · Agreement signed' : ' · Agreement not signed'}</p>
                 {a.photo_url && (
                   <div className="flex items-center gap-2 mt-2">
                     <img src={a.photo_url} alt="" className="w-10 h-10 rounded-full object-cover border border-line" />
