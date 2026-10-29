@@ -52,6 +52,7 @@ export default async function ExperiencePage({ params }: Props) {
   if (!e) notFound();
 
   const cancelled = e.status === 'cancelled';
+
   const { data: seatRows } = await supabaseAdmin
     .from('experience_bookings')
     .select('seats')
@@ -59,8 +60,11 @@ export default async function ExperiencePage({ params }: Props) {
     .eq('status', 'confirmed');
   const confirmedSeats = (seatRows || []).reduce((sum: number, r: { seats: number }) => sum + r.seats, 0);
   const seatsLeft = Math.max(0, e.capacity - confirmedSeats);
+
   const finished = e.status === 'completed' || e.event_date < todayIso();
   const state = cancelled ? 'cancelled' : finished ? 'finished' : 'open';
+
+  const seatsText = state === 'open' ? `${seatsLeft} left of ${e.capacity}` : String(e.capacity);
 
   const facts: [string, string][] = [
     ['Date', formatDate(e.event_date)],
@@ -69,7 +73,7 @@ export default async function ExperiencePage({ params }: Props) {
     ['Where', e.location],
     ['Format', FORMAT_LABEL[e.format]],
     ['Level', SKILL_LABEL[e.skill_level]],
-    ['Seats', state === 'open' ? \${seatsLeft} left of ${e.capacity}` : String(e.capacity)],`
+    ['Seats', seatsText],
     ['Price', e.price],
   ];
 
