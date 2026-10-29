@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 import Avatar from '@/components/Avatar';
+import { shrinkImage } from '@/lib/shrink-image';
 
 const MEDIUMS = [
   'Painting', 'Drawing', 'Portrait', 'Sculpture',
@@ -73,11 +74,13 @@ export default function EditProfilePage() {
   }
 
   async function uploadPhoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+    const original = e.target.files?.[0];
     e.target.value = '';
-    if (!file) return;
+    if (!original) return;
+    setPhotoBusy(true);
+    const file = await shrinkImage(original, 1000);
     setPhotoMsg('');
-    if (file.size > MAX_BYTES) { setPhotoMsg('That image is over 4 MB. Please choose a smaller one.'); return; }
+    if (file.size > MAX_BYTES) { setPhotoBusy(false); setPhotoMsg('That image is still over 4 MB. Please choose a different one.'); return; }
     setPhotoBusy(true);
     const upload = new FormData();
     upload.append('file', file);

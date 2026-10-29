@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { shrinkImage } from '@/lib/shrink-image';
 import HostAttendees from '@/components/HostAttendees';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 import {
@@ -92,9 +93,10 @@ export default function ArtistExperiencesPage() {
     setError('');
   }
 
-  function pick(e: React.ChangeEvent<HTMLInputElement>) {
+  async function pick(e: React.ChangeEvent<HTMLInputElement>) {
     setError('');
-    const picked = e.target.files?.[0] || null;
+    const original = e.target.files?.[0] || null;
+    const picked = original ? await shrinkImage(original) : null;
     if (picked && picked.size > MAX_BYTES) {
       setError('That image is over 4 MB. Please choose a smaller one.');
       e.target.value = '';
@@ -300,6 +302,7 @@ export default function ArtistExperiencesPage() {
                   {formatDate(e.event_date)} · {formatTime(e.start_time)} · {FORMAT_LABEL[e.format]}
                 </p>
                 <p className="text-sm text-ink-soft">{e.location} · {e.price} · {e.capacity} seats</p>
+                {(e.status === 'published' || e.status === 'completed') && <HostAttendees experienceId={e.id} />}
                 <div className="flex flex-wrap gap-2 mt-3">
                   {['pending', 'rejected', 'published'].includes(e.status) && (
                     <button onClick={() => openEdit(e)}

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-browser';
+import { shrinkImage } from '@/lib/shrink-image';
 
 const MAX_BYTES = 4 * 1024 * 1024;
 
@@ -42,9 +43,10 @@ export default function SubmitArtworkPage() {
     init();
   }, [router]);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     setErrorMsg('');
-    const file = e.target.files?.[0] || null;
+    const original = e.target.files?.[0] || null;
+    const file = original ? await shrinkImage(original) : null;
     if (file && file.size > MAX_BYTES) {
       setErrorMsg('That image is over 4 MB. Please choose a smaller one.');
       e.target.value = '';
@@ -174,7 +176,7 @@ export default function SubmitArtworkPage() {
         </label>
 
         <div>
-          <label className="text-sm font-medium block mb-2">Photo (JPG, PNG or WebP, under 4 MB)</label>
+          <label className="text-sm font-medium block mb-2">Photo (JPG, PNG or WebP; large photos are resized for you)</label>
           <input required type="file" accept="image/jpeg,image/png,image/webp"
             onChange={handleFileChange} className="w-full text-sm" />
           {previewUrl && <img src={previewUrl} alt="Preview" className="mt-3 rounded-lg max-h-48 object-cover" />}

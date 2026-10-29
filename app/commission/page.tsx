@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { shrinkImage } from '@/lib/shrink-image';
 
 const MEDIUMS = ['Painting','Drawing','Portrait','Sculpture','Photography','Textile / Fiber art','Ceramics','Mixed media','Not sure yet'];
 const STYLES = ['Abstract','Contemporary realism','Landscape','Still life','Other','Not sure yet'];
@@ -19,9 +20,10 @@ export default function CommissionPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [trackToken, setTrackToken] = useState('');
 
-  function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     setRefError('');
-    const picked = Array.from(e.target.files || []);
+    const originals = Array.from(e.target.files || []);
+    const picked = await Promise.all(originals.map(f => shrinkImage(f)));
     const tooBig = picked.find(f => f.size > MAX_BYTES);
     if (tooBig) {
       setRefError(`"${tooBig.name}" is over 4 MB. Please choose a smaller image.`);

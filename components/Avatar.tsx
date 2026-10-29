@@ -1,3 +1,9 @@
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
+import { canOptimize } from '@/lib/image-host';
+
 export default function Avatar({
   name,
   src,
@@ -7,6 +13,8 @@ export default function Avatar({
   src?: string | null;
   size?: number;
 }) {
+  const [failed, setFailed] = useState(false);
+
   const initials = name
     .split(/\s+/)
     .filter(Boolean)
@@ -15,6 +23,21 @@ export default function Avatar({
     .join('');
 
   if (src) {
+    const cls = 'rounded-full object-cover border border-line shrink-0';
+    if (canOptimize(src) && !failed) {
+      return (
+        <Image
+          src={src}
+          alt=""
+          width={size}
+          height={size}
+          sizes={`${size}px`}
+          onError={() => setFailed(true)}
+          style={{ width: size, height: size }}
+          className={cls}
+        />
+      );
+    }
     return (
       <img
         src={src}
@@ -22,7 +45,7 @@ export default function Avatar({
         width={size}
         height={size}
         style={{ width: size, height: size }}
-        className="rounded-full object-cover border border-line shrink-0"
+        className={cls}
       />
     );
   }
