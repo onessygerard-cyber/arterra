@@ -171,7 +171,7 @@ export default function EditProfilePage() {
           </div>
         </div>
         {photoMsg && <p className="text-sm text-ink-soft mt-3">{photoMsg}</p>}
-        <p className="text-xs text-ink-soft mt-3">JPG, PNG or WebP, under 4 MB. A square photo works best.</p>
+        <p className="text-xs text-ink-soft mt-3">JPG, PNG or WebP. Large photos are resized for you. A portrait-style photo, taller than wide, works best. It appears on your public page and on the home page.</p>
       </div>
 
       <form onSubmit={save} className="space-y-4 bg-card border border-line rounded-xl p-7 shadow-sm">
@@ -198,7 +198,10 @@ export default function EditProfilePage() {
         <input required placeholder="Typical turnaround" value={form.turnaround}
           onChange={e => setForm({ ...form, turnaround: e.target.value })} className={inputClass} />
         <textarea required placeholder="About your work" value={form.bio}
-          onChange={e => setForm({ ...form, bio: e.target.value })} className={inputClass} rows={5} />
+          onChange={e => setForm({ ...form, bio: e.target.value })} className={inputClass} rows={9} maxLength={3000} />
+        <p className="text-xs text-ink-soft -mt-2">
+          Tell visitors about your work and how you make it. You can write up to 3,000 characters, and line breaks are kept.
+        </p>
         <div>
           <input required placeholder="Email or WhatsApp" value={form.contact}
             onChange={e => setForm({ ...form, contact: e.target.value })} className={inputClass} />

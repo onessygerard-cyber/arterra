@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import FadeImage from '@/components/FadeImage';
-import Avatar from '@/components/Avatar';
+import ArtistPortrait from '@/components/ArtistPortrait';
 import ShareLinks from '@/components/ShareLinks';
 import AvailabilityMark from '@/components/AvailabilityMark';
-import { pillClass } from '@/lib/pill';
 import ReviewsSection, { type Review } from '@/components/ReviewsSection';
+import { pillClass } from '@/lib/pill';
 
 type Artist = {
   id: string; name: string; location: string; bio: string; price_range: string;
@@ -20,11 +20,6 @@ type Artwork = {
   year: string; framed_status: string; style: string;
 };
 type Filter = 'all' | 'original' | 'print';
-
-const tabClass = (active: boolean) =>
-  `min-h-11 px-1 text-sm font-medium border-b-2 -mb-px transition-colors ${
-    active ? 'border-blue-deep text-ink' : 'border-transparent text-ink-soft hover:text-ink'
-  }`;
 
 function framedLabel(s: string) {
   if (s === 'framed') return 'Framed, ready to hang';
@@ -133,10 +128,18 @@ export default function ArtistProfilePage() {
   if (loading) {
     return (
       <main className="max-w-4xl mx-auto mt-16 px-6 pb-20" aria-busy="true">
-        <div className="h-9 w-64 bg-sand rounded motion-safe:animate-pulse mb-3" />
-        <div className="h-4 w-32 bg-sand rounded motion-safe:animate-pulse mb-6" />
-        <div className="h-4 w-full max-w-prose bg-sand rounded motion-safe:animate-pulse mb-2" />
-        <div className="h-4 w-2/3 max-w-prose bg-sand rounded motion-safe:animate-pulse mb-10" />
+        <div className="grid gap-10 md:grid-cols-12 md:gap-12 mb-16">
+          <div className="md:col-span-4">
+            <div className="mx-auto w-48 md:w-full aspect-[3/4] rounded-t-full bg-sand motion-safe:animate-pulse" />
+          </div>
+          <div className="md:col-span-8 space-y-3">
+            <div className="h-4 w-32 bg-sand rounded motion-safe:animate-pulse" />
+            <div className="h-10 w-2/3 bg-sand rounded motion-safe:animate-pulse" />
+            <div className="h-4 w-full max-w-prose bg-sand rounded motion-safe:animate-pulse mt-8" />
+            <div className="h-4 w-5/6 max-w-prose bg-sand rounded motion-safe:animate-pulse" />
+            <div className="h-4 w-2/3 max-w-prose bg-sand rounded motion-safe:animate-pulse" />
+          </div>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
           {[0, 1, 2].map(i => (
             <div key={i} className="aspect-square bg-sand rounded motion-safe:animate-pulse" />
@@ -158,6 +161,8 @@ export default function ArtistProfilePage() {
     );
   }
 
+  const bio = (artist.bio || '').trim();
+
   const specs: [string, string][] = detail
     ? ([
         ['Medium', detail.medium],
@@ -170,32 +175,66 @@ export default function ArtistProfilePage() {
 
   return (
     <main className="max-w-4xl mx-auto mt-16 px-6 pb-24">
-      <div className="flex justify-between items-start gap-4 mb-2">
-        <div className="flex items-center gap-4">
-          <Avatar name={artist.name} src={artist.photo_url} size={72} />
-          <div>
-            <h1 className="text-3xl mb-1">{artist.name}</h1>
-            <p className="text-ink-soft">{artist.location}</p>
-          </div>
+      <section className="grid gap-10 md:grid-cols-12 md:gap-12">
+        <div className="md:col-span-4">
+          <ArtistPortrait name={artist.name} src={artist.photo_url} className="mx-auto w-48 md:w-full" />
         </div>
-        <button onClick={() => copy(window.location.origin + '/artist/' + id, 'profile')}
-          className="min-h-11 text-sm font-medium border border-line bg-card px-4 rounded-full hover:bg-sand whitespace-nowrap">
-          {copied === 'profile' ? 'Copied!' : 'Copy Link'}
-        </button>
-      </div>
 
-      <div className="flex flex-wrap gap-1.5 my-4">
-        {artist.mediums?.map(m => (
-          <span key={m} className="text-xs bg-blue/10 text-blue-deep px-2.5 py-1 rounded-full font-medium">{m}</span>
-        ))}
-      </div>
+        <div className="md:col-span-8">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              {artist.location && (
+                <p className="font-mono text-xs text-ink-soft mb-2">{artist.location}</p>
+              )}
+              <h1 className="text-4xl md:text-5xl leading-tight">{artist.name}</h1>
+            </div>
+            <button onClick={() => copy(window.location.origin + '/artist/' + id, 'profile')}
+              className="min-h-11 text-sm font-medium border border-line bg-card px-4 rounded-full hover:bg-sand whitespace-nowrap shrink-0">
+              {copied === 'profile' ? 'Copied!' : 'Copy Link'}
+            </button>
+          </div>
 
-      <p className="text-ink mb-3 max-w-prose">{artist.bio}</p>
-      <p className="text-sm font-mono text-ink-soft mb-14">
-        From {artist.price_range} · {artist.turnaround} · Ships {artist.ships_to || 'by arrangement'}
-      </p>
+          {artist.mediums && artist.mediums.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-5">
+              {artist.mediums.map(m => (
+                <span key={m} className="text-xs bg-blue/10 text-blue-deep px-2.5 py-1 rounded-full font-medium">{m}</span>
+              ))}
+            </div>
+          )}
 
-      <h2 className="text-xl mb-4">
+          <h2 className="text-lg mt-10 mb-3">About</h2>
+          {bio ? (
+            <p
+              className={`text-ink whitespace-pre-line max-w-prose leading-relaxed ${
+                bio.length >= 200
+                  ? 'first-letter:float-left first-letter:mr-2 first-letter:font-display first-letter:text-5xl first-letter:leading-[0.85]'
+                  : ''
+              }`}
+            >
+              {bio}
+            </p>
+          ) : (
+            <p className="text-ink-soft italic">This artist hasn&apos;t written a bio yet.</p>
+          )}
+
+          <dl className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-5 border-t border-line pt-6 text-sm">
+            <div>
+              <dt className="font-mono text-xs text-ink-soft mb-1">Prices from</dt>
+              <dd>{artist.price_range || 'On request'}</dd>
+            </div>
+            <div>
+              <dt className="font-mono text-xs text-ink-soft mb-1">Turnaround</dt>
+              <dd>{artist.turnaround || 'By arrangement'}</dd>
+            </div>
+            <div>
+              <dt className="font-mono text-xs text-ink-soft mb-1">Ships</dt>
+              <dd>{artist.ships_to || 'By arrangement'}</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <h2 className="text-2xl mt-20 mb-6">
         Artwork <span className="font-mono text-sm text-ink-soft font-normal">({filtered.length})</span>
       </h2>
 
@@ -235,9 +274,7 @@ export default function ArtistProfilePage() {
             <span className="block text-sm font-medium mt-2">
               {priceLabel(a)}
               {a.status === 'approved' && <AvailabilityMark status="approved" className="ml-2 align-middle" />}
-              {a.status === 'sold' && (
-                <AvailabilityMark status="sold" className="ml-2 align-middle" />
-              )}
+              {a.status === 'sold' && <AvailabilityMark status="sold" className="ml-2 align-middle" />}
             </span>
           </button>
         ))}
@@ -290,9 +327,7 @@ export default function ArtistProfilePage() {
                 <p className="font-mono text-lg mb-5">
                   {priceLabel(detail)}
                   {detail.status === 'approved' && <AvailabilityMark status="approved" className="ml-3 align-middle" />}
-                  {detail.status === 'sold' && (
-                    <AvailabilityMark status="sold" className="ml-3 align-middle" />
-                  )}
+                  {detail.status === 'sold' && <AvailabilityMark status="sold" className="ml-3 align-middle" />}
                 </p>
 
                 {detail.status === 'sold' ? (
