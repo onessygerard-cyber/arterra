@@ -9,6 +9,7 @@ import ShareLinks from '@/components/ShareLinks';
 import AvailabilityMark from '@/components/AvailabilityMark';
 import ReviewsSection, { type Review } from '@/components/ReviewsSection';
 import { pillClass } from '@/lib/pill';
+import { SAVED_EVENT, readSaved, writeSaved } from '@/lib/saved';
 
 type Artist = {
   id: string; name: string; location: string; bio: string; price_range: string;
@@ -54,6 +55,23 @@ export default function ArtistProfilePage() {
   const [inquirySending, setInquirySending] = useState(false);
   const [inquiryError, setInquiryError] = useState('');
   const [copied, setCopied] = useState<'' | 'profile' | 'piece'>('');
+  const [saved, setSaved] = useState<string[]>([]);
+
+  useEffect(() => {
+    const sync = () => setSaved(readSaved());
+    sync();
+    window.addEventListener(SAVED_EVENT, sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener(SAVED_EVENT, sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, []);
+
+  function toggleSaved(pieceId: string) {
+    const current = readSaved();
+    writeSaved(current.includes(pieceId) ? current.filter(x => x !== pieceId) : [...current, pieceId]);
+  }
 
   useEffect(() => {
     async function load() {
@@ -343,6 +361,31 @@ export default function ArtistProfilePage() {
                   </button>
                 )}
 
+                <button
+                  type="button"
+                  onClick={() => toggleSaved(detail.id)}
+                  aria-pressed={saved.includes(detail.id)}
+                  className={`mb-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border text-sm font-medium transition-colors ${
+                    saved.includes(detail.id)
+                      ? 'border-brand bg-brand/10 text-brand'
+                      : 'border-line text-ink hover:bg-sand'
+                  }`}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill={saved.includes(detail.id) ? 'currentColor' : 'none'}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                  </svg>
+                  {saved.includes(detail.id) ? 'Saved' : 'Save for later'}
+                </button>
                 <ShareLinks
                   title={detail.title}
                   artist={artist.name}

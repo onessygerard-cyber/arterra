@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import ArtSlideshow, { type Slide } from '@/components/ArtSlideshow';
 
@@ -40,13 +41,13 @@ async function load(): Promise<Slide[]> {
   }
 }
 
-export default async function HomeSlideshow() {
+export default async function HomeSlideshow({ children }: { children?: ReactNode }) {
   const slides = await load();
 
-  if (slides.length === 0) {
-    return (
-      <ArtSlideshow
-        slides={[
+  const list: Slide[] =
+    slides.length > 0
+      ? slides
+      : [
           {
             id: 'brushwork',
             image: '/hero-brushwork.jpg',
@@ -56,10 +57,7 @@ export default async function HomeSlideshow() {
             href: '/join',
             fallback: true,
           },
-        ]}
-      />
-    );
-  }
+        ];
 
-  return <ArtSlideshow slides={slides} />;
+  return <ArtSlideshow slides={list}>{children}</ArtSlideshow>;
 }

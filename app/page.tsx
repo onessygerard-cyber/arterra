@@ -16,58 +16,49 @@ const steps = [
 export default function HomePage() {
   return (
     <main>
-      <section className="relative isolate overflow-hidden bg-night text-bone">
-        <HeroBackdrop take={0} />
-        <div className="relative mx-auto grid max-w-4xl items-center gap-14 px-6 pt-16 pb-20 md:grid-cols-12 md:pt-24 md:pb-28">
-          <div className="md:col-span-7">
-            <p className="mb-6 font-mono text-xs uppercase tracking-wider text-gold">
-              Now onboarding artists
-            </p>
-            <h1 className="mb-6 text-5xl leading-[1.04] md:text-6xl">
-              Your vision.
-              <br />
-              <span className="relative inline-block">
-                <em className="font-display italic text-gold">Made original.</em>
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 300 14"
-                  preserveAspectRatio="none"
-                  className="absolute -bottom-2 left-0 h-3 w-full"
-                  fill="none"
-                >
-                  <path
-                    d="M3 9 C 50 2, 100 13, 160 6 S 250 10, 297 4"
-                    stroke="#FBCD0D"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-            </h1>
-            <p className="mb-10 mt-8 max-w-md text-lg text-bone/85">
-              ARTERRA matches you with vetted independent artists, working in painting, drawing, portraiture, and more, to create a piece made to your size, budget, and story.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/commission"
-                className="inline-flex min-h-12 items-center rounded-lg bg-brand px-7 font-medium text-cream hover:bg-brand-deep"
-              >
-                Commission a Piece
-              </Link>
-              <Link
-                href="/join"
-                className="inline-flex min-h-12 items-center rounded-lg border border-bone/60 px-7 font-medium text-bone hover:bg-bone hover:text-night"
-              >
-                Register as an Artist
-              </Link>
-            </div>
-          </div>
-
-          <div className="md:col-span-5">
-            <HomeSlideshow />
-          </div>
+      <HomeSlideshow>
+        <p className="mb-6 font-mono text-xs uppercase tracking-wider text-gold">
+          Now onboarding artists
+        </p>
+        <h1 className="mb-6 text-5xl leading-[1.04] md:text-6xl">
+          Your vision.
+          <br />
+          <span className="relative inline-block">
+            <em className="font-display italic text-gold">Made original.</em>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 300 14"
+              preserveAspectRatio="none"
+              className="absolute -bottom-2 left-0 h-3 w-full"
+              fill="none"
+            >
+              <path
+                d="M3 9 C 50 2, 100 13, 160 6 S 250 10, 297 4"
+                stroke="#FBCD0D"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+        </h1>
+        <p className="mb-10 mt-8 max-w-md text-lg text-bone/85">
+          ARTERRA matches you with vetted independent artists, working in painting, drawing, portraiture, and more, to create a piece made to your size, budget, and story.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/commission"
+            className="inline-flex min-h-12 items-center rounded-lg bg-brand px-7 font-medium text-cream hover:bg-brand-deep"
+          >
+            Commission a Piece
+          </Link>
+          <Link
+            href="/join"
+            className="inline-flex min-h-12 items-center rounded-lg border border-bone/60 px-7 font-medium text-bone hover:bg-bone hover:text-night"
+          >
+            Register as an Artist
+          </Link>
         </div>
-      </section>
+      </HomeSlideshow>
 
       <MeetArtists />
 
