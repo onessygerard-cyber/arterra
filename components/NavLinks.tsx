@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 import { pill, pillCta, pillIdle, pillOn } from '@/lib/pill';
 import ThemeToggle from '@/components/ThemeToggle';
+import SavedMenu from '@/components/SavedMenu';
 
 const ARTIST_AREA = /^\/artist\/(dashboard|profile|password|experiences)(\/|$)/;
 
@@ -139,7 +140,7 @@ export default function NavLinks() {
         Become an Artist
       </Link>
 
-      <ThemeToggle />
+      <SavedMenu /><ThemeToggle />
 
       <div
         ref={menuRef}

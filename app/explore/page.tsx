@@ -51,6 +51,7 @@ function toggleFavorite(id: string): string[] {
   const current = getFavorites();
   const next = current.includes(id) ? current.filter(x => x !== id) : [...current, id];
   try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(next)); } catch {}
+  window.dispatchEvent(new Event('arterra-saved'));
   return next;
 }
 
@@ -103,6 +104,20 @@ export default function ExplorePage() {
     }
     load();
     setFavorites(getFavorites());
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('saved') === '1') {
+      setView('all');
+      setShowFavoritesOnly(true);
+    }
+
+    const sync = () => setFavorites(getFavorites());
+    window.addEventListener('arterra-saved', sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener('arterra-saved', sync);
+      window.removeEventListener('storage', sync);
+    };
   }, []);
 
   function resetFilters() {
