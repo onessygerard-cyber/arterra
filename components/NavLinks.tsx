@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 import { pill, pillCta, pillIdle, pillOn } from '@/lib/pill';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const ARTIST_AREA = /^\/artist\/(dashboard|profile|password|experiences)(\/|$)/;
 
@@ -120,7 +121,7 @@ export default function NavLinks() {
   const iconTone = studioActive
     ? 'border-brand bg-brand text-cream hover:bg-brand-deep'
     : isAdmin
-      ? 'border-blue-deep bg-blue-deep text-cream hover:bg-night'
+      ? 'border-blue-deep bg-blue-deep text-cream hover:bg-ink'
       : pillIdle;
 
   return (
@@ -137,6 +138,8 @@ export default function NavLinks() {
       >
         Become an Artist
       </Link>
+
+      <ThemeToggle />
 
       <div
         ref={menuRef}

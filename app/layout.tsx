@@ -8,22 +8,25 @@ import { siteUrl } from "@/lib/site-url";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
-    default: "Arterra: Your vision. Made original.",
-    template: "%s | Arterra",
+    default: "ARTERRA: Your vision. Made original.",
+    template: "%s | ARTERRA",
   },
   description: "Commission original art from vetted independent artists.",
   openGraph: {
-    siteName: "Arterra",
+    siteName: "ARTERRA",
     type: "website",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: { card: "summary_large_image" },
 };
 
+const themeScript = `(function(){try{var s=localStorage.getItem('arterra-theme');var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

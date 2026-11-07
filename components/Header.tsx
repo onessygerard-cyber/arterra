@@ -13,7 +13,15 @@ export default function Header() {
             width={800}
             height={233}
             priority
-            className="h-12 md:h-14 w-auto"
+            className="h-12 md:h-14 w-auto dark:hidden"
+          />
+          <Image
+            src="/arterra-logo-light.png"
+            alt="ARTERRA"
+            width={800}
+            height={233}
+            loading="lazy"
+            className="hidden h-12 md:h-14 w-auto dark:block"
           />
         </Link>
         <NavLinks />
