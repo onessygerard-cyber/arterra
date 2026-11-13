@@ -169,7 +169,7 @@ export default function SavedMenu() {
             aria-hidden="true"
             className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[11px] font-semibold leading-none text-cream"
           >
-            {count > 99 ? '99+' : count}
+            <span key={count} className="badge-bump inline-block">{count > 99 ? '99+' : count}</span>
           </span>
         )}
       </button>

@@ -323,7 +323,7 @@ export default function ExplorePage() {
                       </span>
                     </Link>
                     <button onClick={() => setFavorites(toggleFavorite(a.id))}
-                      aria-label={saved ? 'Remove from saved' : 'Save this piece'}
+                      aria-label={saved ? 'Remove from saved' : 'Save this piece'} data-heart="true"
                       className={`w-11 h-11 -mr-2 -mt-2 flex items-center justify-center text-lg hover:text-ink ${saved ? 'text-ink' : 'text-ink-soft'}`}>
                       {saved ? '♥' : '♡'}
                     </button>

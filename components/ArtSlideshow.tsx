@@ -251,7 +251,7 @@ export default function ArtSlideshow({
                   <button
                     type="button"
                     onClick={() => toggleSaved(slide.id)}
-                    aria-pressed={isSaved}
+                    aria-pressed={isSaved} data-heart="true"
                     aria-label={isSaved ? `Remove ${slide.title} from saved` : `Save ${slide.title}`}
                     className={`inline-flex min-h-11 w-11 items-center justify-center rounded-full border transition-colors ${
                       isSaved

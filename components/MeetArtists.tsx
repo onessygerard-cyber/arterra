@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import Reveal from '@/components/Reveal';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { canOptimize } from '@/lib/image-host';
 
@@ -44,7 +45,7 @@ export default async function MeetArtists() {
   if (artists.length === 0) return null;
 
   return (
-    <section className="max-w-4xl mx-auto px-6 pt-20 pb-24" aria-labelledby="meet-title">
+    <Reveal as="section" className="max-w-4xl mx-auto px-6 pt-20 pb-24" aria-labelledby="meet-title">
       <div className="mb-10 flex items-baseline justify-between gap-4">
         <h2 id="meet-title" className="text-2xl">Meet the artists</h2>
         <Link href="/explore" className="inline-flex min-h-11 items-center text-sm text-blue-deep underline">
@@ -92,6 +93,6 @@ export default async function MeetArtists() {
           );
         })}
       </div>
-    </section>
+    </Reveal>
   );
 }

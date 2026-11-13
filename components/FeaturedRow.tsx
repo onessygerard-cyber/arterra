@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Reveal from '@/components/Reveal';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import FadeImage from '@/components/FadeImage';
 import AvailabilityMark from '@/components/AvailabilityMark';
@@ -37,7 +38,7 @@ export default async function FeaturedRow() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 pb-24">
-      <section aria-labelledby="featured-title">
+      <Reveal as="section" aria-labelledby="featured-title">
         <div className="flex items-baseline justify-between mb-8">
           <h2 id="featured-title" className="text-2xl">Featured</h2>
           <Link href="/explore" className="inline-flex items-center min-h-11 text-sm underline text-blue-deep">
@@ -72,7 +73,7 @@ export default async function FeaturedRow() {
             );
           })}
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

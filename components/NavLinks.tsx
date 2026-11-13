@@ -7,6 +7,7 @@ import { supabaseBrowser } from '@/lib/supabase-browser';
 import { pill, pillCta, pillIdle, pillOn } from '@/lib/pill';
 import ThemeToggle from '@/components/ThemeToggle';
 import SavedMenu from '@/components/SavedMenu';
+import MobileMenu from '@/components/MobileMenu';
 
 const ARTIST_AREA = /^\/artist\/(dashboard|profile|password|experiences)(\/|$)/;
 
@@ -126,25 +127,27 @@ export default function NavLinks() {
       : pillIdle;
 
   return (
-    <nav aria-label="Main" className="flex flex-wrap items-center gap-2">
-      {item('explore', '/explore', 'Explore')}
-      {item('commission', '/commission', 'Commission')}
-      {item('experiences', '/experiences', 'Experiences')}
-      {item('login', '/artist-login', 'Artist Login')}
+    <nav aria-label="Main" className="flex items-center gap-2">
+      <div className="hidden items-center gap-2 lg:flex">
+        {item('explore', '/explore', 'Explore')}
+        {item('commission', '/commission', 'Commission')}
+        {item('experiences', '/experiences', 'Experiences')}
+        {item('login', '/artist-login', 'Artist Login')}
+        <Link
+          href="/join"
+          aria-current={joinActive ? 'page' : undefined}
+          className={`${pill} ${joinActive ? pillOn : pillCta}`}
+        >
+          Become an Artist
+        </Link>
+      </div>
 
-      <Link
-        href="/join"
-        aria-current={joinActive ? 'page' : undefined}
-        className={`${pill} ${joinActive ? pillOn : pillCta}`}
-      >
-        Become an Artist
-      </Link>
-
-      <SavedMenu /><ThemeToggle />
+      <SavedMenu />
+      <ThemeToggle />
 
       <div
         ref={menuRef}
-        className="relative"
+        className="relative hidden lg:block"
         onBlur={e => {
           const next = e.relatedTarget as Node | null;
           if (next && !e.currentTarget.contains(next)) setOpenFor(null);
@@ -194,6 +197,8 @@ export default function NavLinks() {
           </div>
         )}
       </div>
+
+      <MobileMenu current={current} isAdmin={isAdmin} onSignOut={signOut} />
     </nav>
   );
 }

@@ -3,6 +3,7 @@ import FeaturedRow from "@/components/FeaturedRow";
 import HeroBackdrop from "@/components/HeroBackdrop";
 import HomeSlideshow from "@/components/HomeSlideshow";
 import MeetArtists from "@/components/MeetArtists";
+import Reveal from "@/components/Reveal";
 
 export const revalidate = 300;
 
@@ -66,7 +67,7 @@ export default function HomePage() {
 
       <section className="mx-auto max-w-4xl px-6 pb-24" aria-labelledby="how-title">
         <h2 id="how-title" className="mb-10 text-2xl">How it works</h2>
-        <ol className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <Reveal as="ol" stagger className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {steps.map(([num, title, body]) => (
             <li key={num} className="border-t-2 border-ink pt-4">
               <span className="mb-2 block font-display text-4xl text-brand">{num}</span>
@@ -74,7 +75,7 @@ export default function HomePage() {
               <p className="text-sm text-ink-soft">{body}</p>
             </li>
           ))}
-        </ol>
+        </Reveal>
       </section>
 
       <section className="relative isolate overflow-hidden bg-night text-bone">
