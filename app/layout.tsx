@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Toaster from "@/components/Toaster";
 import { siteUrl } from "@/lib/site-url";
 
 export const metadata: Metadata = {
@@ -37,7 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-1">{children}</div>
-        <Footer />
+        <Footer /><Toaster />
       </body>
     </html>
   );

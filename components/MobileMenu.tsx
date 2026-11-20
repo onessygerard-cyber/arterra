@@ -11,6 +11,7 @@ const LINKS = [
   { key: 'commission', href: '/commission', label: 'Commission' },
   { key: 'experiences', href: '/experiences', label: 'Experiences' },
   { key: 'login', href: '/artist-login', label: 'Artist Login' },
+  { key: 'about', href: '/about', label: 'About' },
 ];
 
 function delay(ms: number): CSSProperties {

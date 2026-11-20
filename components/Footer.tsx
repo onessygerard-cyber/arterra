@@ -12,6 +12,7 @@ export default function Footer() {
       <div className="max-w-4xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm text-ink-soft">
         <p>© {new Date().getFullYear()} ARTERRA</p>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
+          <Link href="/about" className={link}>About</Link>
           {legal && (
             <>
               <Link href="/terms" className={link}>Terms</Link>

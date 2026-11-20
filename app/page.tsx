@@ -78,6 +78,44 @@ export default function HomePage() {
         </Reveal>
       </section>
 
+      <Reveal as="section" className="mx-auto max-w-4xl px-6 pb-24" aria-labelledby="about-title">
+        <div className="grid gap-8 md:grid-cols-12 md:items-end">
+          <div className="md:col-span-7">
+            <p className="mb-3 font-mono text-xs uppercase tracking-wider text-ink-soft">About</p>
+            <h2 id="about-title" className="text-3xl leading-tight md:text-4xl">
+              A small gallery, run by hand.
+            </h2>
+          </div>
+          <div className="md:col-span-5">
+            <p className="mb-4 text-ink-soft">
+              Every artist is reviewed by a person, and every commission is matched by one. That is how we keep it personal.
+            </p>
+            <Link href="/about" className="inline-flex min-h-11 items-center text-sm text-blue-deep underline">
+              About ARTERRA
+            </Link>
+          </div>
+        </div>
+      </Reveal>
+
+      <Reveal as="section" className="mx-auto max-w-4xl px-6 pb-24" aria-labelledby="about-title">
+        <div className="grid gap-8 md:grid-cols-12 md:items-end">
+          <div className="md:col-span-7">
+            <p className="mb-3 font-mono text-xs uppercase tracking-wider text-ink-soft">About</p>
+            <h2 id="about-title" className="text-3xl leading-tight md:text-4xl">
+              A small gallery, run by hand.
+            </h2>
+          </div>
+          <div className="md:col-span-5">
+            <p className="mb-4 text-ink-soft">
+              Every artist is reviewed by a person, and every commission is matched by one. That is how we keep it personal.
+            </p>
+            <Link href="/about" className="inline-flex min-h-11 items-center text-sm text-blue-deep underline">
+              About ARTERRA
+            </Link>
+          </div>
+        </div>
+      </Reveal>
+
       <section className="relative isolate overflow-hidden bg-night text-bone">
         <HeroBackdrop skip={1} take={3} flip />
         <div className="relative mx-auto max-w-4xl px-6 py-20 md:py-24">

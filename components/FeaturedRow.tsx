@@ -1,32 +1,47 @@
 import Link from 'next/link';
 import Reveal from '@/components/Reveal';
+import FeaturedGrid, { type FeaturedItem } from '@/components/FeaturedGrid';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import FadeImage from '@/components/FadeImage';
-import AvailabilityMark from '@/components/AvailabilityMark';
 
-type Featured = {
+type Row = {
   id: string;
   title: string;
   price: string | null;
   price_on_request: boolean | null;
   image_url: string | null;
+  image_width: number | null;
+  image_height: number | null;
   artist_id: string;
   listing_type: string;
   status: string;
   artists: { name: string } | null;
 };
 
-async function loadFeatured(): Promise<Featured[]> {
+async function loadFeatured(): Promise<FeaturedItem[]> {
   try {
     const { data } = await supabaseAdmin
       .from('artworks')
-      .select('id, title, price, price_on_request, image_url, artist_id, listing_type, status, artists!inner(name)')
+      .select(
+        'id, title, price, price_on_request, image_url, image_width, image_height, artist_id, listing_type, status, artists!inner(name)'
+      )
       .eq('artists.status', 'verified')
       .in('status', ['approved', 'sold'])
       .eq('is_featured', true)
       .order('created_at', { ascending: false })
       .limit(6);
-    return (data || []) as unknown as Featured[];
+
+    return ((data || []) as unknown as Row[]).map(r => ({
+      id: r.id,
+      title: r.title,
+      price: r.price_on_request || !(r.price || '').trim() ? 'Price on request' : (r.price as string),
+      image_url: r.image_url,
+      image_width: r.image_width,
+      image_height: r.image_height,
+      artist_id: r.artist_id,
+      artist: r.artists?.name ?? '',
+      type: r.listing_type,
+      status: r.status,
+    }));
   } catch {
     return [];
   }
@@ -45,34 +60,7 @@ export default async function FeaturedRow() {
             See all art
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-14">
-          {items.map(a => {
-            const price =
-              a.price_on_request || !(a.price || '').trim() ? 'Price on request' : a.price;
-            return (
-              <Link key={a.id} href={`/artist/${a.artist_id}?piece=${a.id}`} className="group block">
-                <div className="aspect-square">
-                  {a.image_url ? (
-                    <FadeImage
-                      src={a.image_url}
-                      alt=""
-                      className="w-full h-full object-contain object-bottom drop-shadow-sm motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.015]"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-sand" />
-                  )}
-                </div>
-                <span className="block mt-4 font-display text-lg leading-snug">{a.title}</span>
-                <span className="block text-xs text-ink-soft mt-1">
-                  {a.artists?.name} · {a.listing_type === 'original' ? 'Original' : 'Print'}
-                </span>
-                <span className="block text-sm font-medium mt-2">
-                  {price} <AvailabilityMark status={a.status} className="ml-2 align-middle" />
-                </span>
-              </Link>
-            );
-          })}
-        </div>
+        <FeaturedGrid items={items} />
       </Reveal>
     </div>
   );

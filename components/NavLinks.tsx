@@ -16,6 +16,7 @@ function sectionOf(pathname: string): string {
   if (pathname.startsWith('/commission')) return 'commission';
   if (pathname.startsWith('/experiences')) return 'experiences';
   if (pathname.startsWith('/join')) return 'join';
+  if (pathname.startsWith('/about')) return 'about';
   if (pathname.startsWith('/artist-login') || ARTIST_AREA.test(pathname)) return 'login';
   if (pathname.startsWith('/artist/')) return 'explore';
   if (pathname.startsWith('/studio')) return 'studio';

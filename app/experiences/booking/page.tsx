@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Ticket, { type TicketTone } from '@/components/Ticket';
 import { FORMAT_LABEL, formatDate, formatDuration, formatTime } from '@/lib/experiences';
 
 type Data = {
@@ -67,10 +68,10 @@ function BookingContent() {
     await load();
   }
 
-  if (loading) return <main className="max-w-xl mx-auto mt-16 px-6 text-ink-soft">Loading…</main>;
+  if (loading) return <main className="max-w-2xl mx-auto mt-16 px-6 text-ink-soft">Loading…</main>;
   if (notFound || !data) {
     return (
-      <main className="max-w-xl mx-auto mt-16 px-6">
+      <main className="max-w-2xl mx-auto mt-16 px-6">
         <p className="text-ink-soft">We couldn&apos;t find that reservation. Check the link and try again.</p>
       </main>
     );
@@ -79,64 +80,97 @@ function BookingContent() {
   const { booking, experience: e } = data;
   const text = STATUS_TEXT[booking.status] || STATUS_TEXT.requested;
   const cancelledExp = e.status === 'cancelled';
+  const dead = cancelledExp || booking.status === 'declined' || booking.status === 'cancelled';
   const active = ['requested', 'confirmed', 'waitlist'].includes(booking.status) && !e.finished && !cancelledExp;
 
+  const tone: TicketTone = dead ? 'void' : booking.status === 'confirmed' ? 'live' : 'pending';
+  const stampText = cancelledExp
+    ? 'Cancelled'
+    : booking.status === 'declined'
+      ? 'Declined'
+      : booking.status === 'cancelled'
+        ? 'Cancelled'
+        : booking.status === 'confirmed'
+          ? 'Confirmed'
+          : booking.status === 'waitlist'
+            ? 'Waiting list'
+            : 'Awaiting confirmation';
+  const stampClass = dead
+    ? 'border-brand text-brand'
+    : booking.status === 'confirmed'
+      ? 'border-blue-deep text-blue-deep'
+      : 'border-gold-deep text-gold-deep';
+
   return (
-    <main className="max-w-xl mx-auto mt-16 px-6 pb-24">
+    <main className="max-w-2xl mx-auto mt-16 px-6 pb-24">
       <h1 className="text-2xl mb-6">Your reservation</h1>
 
-      {cancelledExp && (
-        <div className="border border-red-300 bg-red-50 text-red-900 rounded-xl p-5 mb-6 text-sm">
-          This experience has been cancelled. Contact ARTERRA about any payment you have made.
-        </div>
-      )}
       {!cancelledExp && e.finished && (
         <div className="border border-line bg-card rounded-xl p-5 mb-6 text-sm text-ink-soft">
           This experience has finished.
         </div>
       )}
 
-      <div className="bg-card border border-line rounded-xl p-6 shadow-sm mb-6">
-        <p className="font-display text-xl mb-1">{text.title}</p>
-        {text.body && <p className="text-sm text-ink-soft">{text.body}</p>}
+      <div className="mb-6">
+        <p className="font-display text-xl mb-1">{cancelledExp ? 'This experience has been cancelled' : text.title}</p>
+        <p className="text-sm text-ink-soft">
+          {cancelledExp ? 'Contact ARTERRA about any payment you have made.' : text.body}
+        </p>
         {booking.admin_note && (
-          <div className="mt-4 pt-4 border-t border-line">
+          <div className="mt-4 rounded-xl border border-line bg-card p-4">
             <p className="text-xs font-medium text-ink-soft mb-1">Message from ARTERRA</p>
             <p className="text-sm whitespace-pre-line">{booking.admin_note}</p>
           </div>
         )}
       </div>
 
-      <div className="bg-card border border-line rounded-xl p-6 shadow-sm mb-6">
-        <h2 className="text-lg mb-3">{e.title}</h2>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 text-sm">
-          <dt className="text-ink-soft">Date</dt><dd>{formatDate(e.event_date)}</dd>
-          <dt className="text-ink-soft">Starts</dt><dd>{formatTime(e.start_time)} (local time)</dd>
-          <dt className="text-ink-soft">Length</dt><dd>{formatDuration(e.duration_minutes)}</dd>
-          <dt className="text-ink-soft">Where</dt><dd>{e.location}</dd>
-          <dt className="text-ink-soft">Format</dt><dd>{FORMAT_LABEL[e.format]}</dd>
-          <dt className="text-ink-soft">Price</dt><dd>{e.price}</dd>
-          <dt className="text-ink-soft">Seats</dt><dd>{booking.seats}</dd>
-          {e.host && (<><dt className="text-ink-soft">Host</dt><dd>{e.host}</dd></>)}
-          <dt className="text-ink-soft">Booked as</dt><dd>{booking.name}</dd>
-        </dl>
+      <Ticket
+        tone={tone}
+        main={
+          <>
+            <p className="font-mono text-xs text-ink-soft mb-2">ARTERRA EXPERIENCE</p>
+            <h2 className="font-display text-2xl leading-snug mb-5">{e.title}</h2>
+            <dl className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 text-sm">
+              <dt className="text-ink-soft">Date</dt><dd>{formatDate(e.event_date)}</dd>
+              <dt className="text-ink-soft">Starts</dt><dd>{formatTime(e.start_time)} (local time)</dd>
+              <dt className="text-ink-soft">Length</dt><dd>{formatDuration(e.duration_minutes)}</dd>
+              <dt className="text-ink-soft">Where</dt><dd>{e.location}</dd>
+              <dt className="text-ink-soft">Format</dt><dd>{FORMAT_LABEL[e.format]}</dd>
+              {e.host && (<><dt className="text-ink-soft">Host</dt><dd>{e.host}</dd></>)}
+            </dl>
 
-        {booking.status === 'confirmed' && !cancelledExp && (
-          <div className="mt-5 pt-5 border-t border-line">
-            <p className="text-xs font-medium text-ink-soft mb-1">
-              {e.format === 'online' ? 'How to join' : 'Where to go'}
-            </p>
-            <p className="text-sm whitespace-pre-line">
-              {e.private_details || 'ARTERRA will send you the details closer to the day.'}
-            </p>
-          </div>
-        )}
-      </div>
+            {booking.status === 'confirmed' && !cancelledExp && (
+              <div className="mt-6 border-t border-line pt-5">
+                <p className="text-xs font-medium text-ink-soft mb-1">
+                  {e.format === 'online' ? 'How to join' : 'Where to go'}
+                </p>
+                <p className="text-sm whitespace-pre-line">
+                  {e.private_details || 'ARTERRA will send you the details closer to the day.'}
+                </p>
+              </div>
+            )}
+          </>
+        }
+        stub={
+          <>
+            <p className="font-mono text-xs text-ink-soft">ADMIT</p>
+            <p className="font-display text-5xl leading-none mt-1">{booking.seats}</p>
+            <p className="text-xs text-ink-soft mt-1">{booking.seats === 1 ? 'seat' : 'seats'}</p>
+            <p className="mt-5 text-sm font-medium">{e.price}</p>
+            <p className="mt-1 text-xs text-ink-soft break-words">Booked as {booking.name}</p>
+            <span
+              className={`mt-5 inline-block -rotate-3 rounded border-2 px-2 py-0.5 text-xs font-bold uppercase tracking-wider ${stampClass}`}
+            >
+              {stampText}
+            </span>
+          </>
+        }
+      />
 
-      {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
+      {error && <p className="text-red-600 text-sm mt-4">{error}</p>}
       {active && (
         <button onClick={cancel} disabled={busy}
-          className="min-h-11 border border-red-300 text-red-800 bg-card px-5 rounded-lg text-sm font-medium hover:bg-red-50 disabled:opacity-50">
+          className="mt-6 min-h-11 border border-red-300 text-red-800 bg-card px-5 rounded-lg text-sm font-medium hover:bg-red-50 disabled:opacity-50">
           {busy ? 'Cancelling…' : 'Cancel my reservation'}
         </button>
       )}
@@ -151,7 +185,7 @@ function BookingContent() {
 
 export default function BookingPage() {
   return (
-    <Suspense fallback={<main className="max-w-xl mx-auto mt-16 px-6 text-ink-soft">Loading…</main>}>
+    <Suspense fallback={<main className="max-w-2xl mx-auto mt-16 px-6 text-ink-soft">Loading…</main>}>
       <BookingContent />
     </Suspense>
   );
