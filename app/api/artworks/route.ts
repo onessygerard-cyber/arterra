@@ -10,6 +10,11 @@ function clean(value: unknown, max: number): string {
   return String(value ?? '').trim().slice(0, max);
 }
 
+function dimension(value: unknown): number | null {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 16 && n <= 20000 ? n : null;
+}
+
 export async function POST(request: Request) {
   const auth = await requireArtist(request);
   if (!auth) return NextResponse.json({ error: 'Please log in again.' }, { status: 401 });
@@ -30,6 +35,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'The image is not valid. Please upload it again.' }, { status: 400 });
   }
 
+  const width = dimension(body.imageWidth);
+  const height = dimension(body.imageHeight);
+  const hasSize = width !== null && height !== null;
+
   const { data, error } = await supabaseAdmin
     .from('artworks')
     .insert({
@@ -45,6 +54,8 @@ export async function POST(request: Request) {
       style: clean(body.style, 120),
       framed_status: FRAMED.includes(body.framedStatus) ? body.framedStatus : '',
       image_url: imageUrl,
+      image_width: hasSize ? width : null,
+      image_height: hasSize ? height : null,
       status: 'pending',
     })
     .select();

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabaseBrowser } from '@/lib/supabase-browser';
 import { shrinkImage } from '@/lib/shrink-image';
+import { readImageSize } from '@/lib/image-size';
 
 const MAX_BYTES = 4 * 1024 * 1024;
 
@@ -21,6 +22,7 @@ export default function SubmitArtworkPage() {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [dims, setDims] = useState<{ width: number; height: number } | null>(null);
   const [status, setStatus] = useState<'idle' | 'saving' | 'done'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -52,7 +54,7 @@ export default function SubmitArtworkPage() {
       e.target.value = '';
       return;
     }
-    setImageFile(file);
+    setImageFile(file); setDims(file ? await readImageSize(file) : null);
     setPreviewUrl(file ? URL.createObjectURL(file) : null);
   }
 
@@ -79,7 +81,7 @@ export default function SubmitArtworkPage() {
     const res = await fetch('/api/artworks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...form, imageUrl: upData.imageUrl }),
+      body: JSON.stringify({ ...form, imageUrl: upData.imageUrl, imageWidth: dims?.width, imageHeight: dims?.height }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import FadeImage from '@/components/FadeImage';
 import Avatar from '@/components/Avatar';
 import AvailabilityMark from '@/components/AvailabilityMark';
+import { masonryItemRef, ratioStyle } from '@/lib/masonry';
 import PillSelect from '@/components/PillSelect';
 import { pillClass } from '@/lib/pill';
 
@@ -14,7 +15,7 @@ type Artist = {
 };
 type Artwork = {
   id: string; title: string; listing_type: string; medium: string | null; style: string | null;
-  price: string; price_on_request: boolean | null; image_url: string; artist_id: string;
+  price: string; price_on_request: boolean | null; image_url: string; image_width: number | null; image_height: number | null; artist_id: string;
   status: string; artists: { name: string } | null;
 };
 type View = 'artists' | 'all' | 'original' | 'print';
@@ -294,14 +295,14 @@ export default function ExplorePage() {
               : <EmptyState message="No pieces match your filters." onReset={resetFilters} />
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-14">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-0 auto-rows-[8px] grid-flow-dense items-start">
             {filteredArtworks.map(a => {
               const href = `/artist/${a.artist_id}?piece=${a.id}`;
               const saved = favorites.includes(a.id);
               return (
-                <div key={a.id} className="group">
+                <div key={a.id} className="group" ref={masonryItemRef}>
                   <Link href={href} className="block" tabIndex={-1} aria-hidden="true">
-                    <div className="aspect-square">
+                    <div style={ratioStyle(a.image_width, a.image_height)}>
                       {a.image_url ? (
                         <FadeImage src={a.image_url} alt=""
                           className="w-full h-full object-contain object-bottom drop-shadow-sm motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.015]" />

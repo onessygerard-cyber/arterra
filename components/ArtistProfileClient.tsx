@@ -9,6 +9,7 @@ import ShareLinks from '@/components/ShareLinks';
 import AvailabilityMark from '@/components/AvailabilityMark';
 import ReviewsSection, { type Review } from '@/components/ReviewsSection';
 import { pillClass } from '@/lib/pill';
+import { masonryItemRef, ratioStyle } from '@/lib/masonry';
 import { SAVED_EVENT, readSaved, writeSaved } from '@/lib/saved';
 
 type Artist = {
@@ -17,7 +18,7 @@ type Artist = {
 };
 type Artwork = {
   id: string; title: string; description: string; listing_type: string; medium: string;
-  size: string; price: string; price_on_request: boolean | null; image_url: string; status: string;
+  size: string; price: string; price_on_request: boolean | null; image_url: string; image_width: number | null; image_height: number | null; status: string;
   year: string; framed_status: string; style: string;
 };
 type Filter = 'all' | 'original' | 'print';
@@ -276,10 +277,10 @@ export default function ArtistProfilePage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-14">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10 gap-y-0 auto-rows-[8px] grid-flow-dense items-start">
         {filtered.map(a => (
-          <button key={a.id} onClick={() => setDetail(a)} className="group block w-full text-left">
-            <span className="block aspect-square">
+          <button key={a.id} onClick={() => setDetail(a)} ref={masonryItemRef} className="group block w-full text-left">
+            <span className="block" style={ratioStyle(a.image_width, a.image_height)}>
               {a.image_url ? (
                 <FadeImage src={a.image_url} alt=""
                   className="w-full h-full object-contain object-bottom drop-shadow-sm motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:scale-[1.015]" />
