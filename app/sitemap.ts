@@ -6,7 +6,7 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
-  const pages: MetadataRoute.Sitemap = ['', '/explore', '/commission', '/experiences', '/about', '/join'].map(path => ({
+  const pages: MetadataRoute.Sitemap = ['', '/explore', '/commission', '/experiences', '/services', '/about', '/join'].map(path => ({
     url: `${base}${path}`,
     changeFrequency: 'weekly' as const,
   }));

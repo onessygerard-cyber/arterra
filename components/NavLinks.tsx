@@ -15,6 +15,7 @@ function sectionOf(pathname: string): string {
   if (pathname.startsWith('/explore')) return 'explore';
   if (pathname.startsWith('/commission')) return 'commission';
   if (pathname.startsWith('/experiences')) return 'experiences';
+  if (pathname.startsWith('/services')) return 'services';
   if (pathname.startsWith('/join')) return 'join';
   if (pathname.startsWith('/about')) return 'about';
   if (pathname.startsWith('/artist-login') || ARTIST_AREA.test(pathname)) return 'login';
@@ -129,10 +130,10 @@ export default function NavLinks() {
 
   return (
     <nav aria-label="Main" className="flex items-center gap-2">
-      <div className="hidden items-center gap-2 lg:flex">
+      <div className="hidden items-center gap-2 xl:flex">
         {item('explore', '/explore', 'Explore')}
         {item('commission', '/commission', 'Commission')}
-        {item('experiences', '/experiences', 'Experiences')}
+        {item('experiences', '/experiences', 'Experiences')}{item('services', '/services', 'Services')}
         {item('login', '/artist-login', 'Artist Login')}
         <Link
           href="/join"
@@ -148,7 +149,7 @@ export default function NavLinks() {
 
       <div
         ref={menuRef}
-        className="relative hidden lg:block"
+        className="relative hidden xl:block"
         onBlur={e => {
           const next = e.relatedTarget as Node | null;
           if (next && !e.currentTarget.contains(next)) setOpenFor(null);

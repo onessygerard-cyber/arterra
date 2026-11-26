@@ -5,7 +5,7 @@ import NavLinks from '@/components/NavLinks';
 export default function Header() {
   return (
     <header className="sticky top-0 z-30 bg-cream/90 backdrop-blur border-b border-line">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
         <Link href="/" aria-label="ARTERRA home" className="shrink-0">
           <Image
             src="/arterra-logo.png"

@@ -10,6 +10,7 @@ const LINKS = [
   { key: 'explore', href: '/explore', label: 'Explore' },
   { key: 'commission', href: '/commission', label: 'Commission' },
   { key: 'experiences', href: '/experiences', label: 'Experiences' },
+  { key: 'services', href: '/services', label: 'Services' },
   { key: 'login', href: '/artist-login', label: 'Artist Login' },
   { key: 'about', href: '/about', label: 'About' },
 ];
@@ -66,7 +67,7 @@ export default function MobileMenu({
       }
     }
 
-    const wide = window.matchMedia('(min-width: 1024px)');
+    const wide = window.matchMedia('(min-width: 1280px)');
     function onWide(e: MediaQueryListEvent) {
       if (e.matches) setOpenFor(null);
     }
@@ -92,7 +93,7 @@ export default function MobileMenu({
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={() => setOpenFor(pathname)}
-        className="inline-flex min-h-11 w-11 items-center justify-center rounded-full border border-brand/40 text-brand transition-colors hover:border-brand hover:bg-brand/5 lg:hidden"
+        className="inline-flex min-h-11 w-11 items-center justify-center rounded-full border border-brand/40 text-brand transition-colors hover:border-brand hover:bg-brand/5 xl:hidden"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
           <path d="M4 8h16M4 16h16" />
