@@ -80,7 +80,7 @@ export const privacyDoc: LegalDoc = {
         "Vercel: hosting and delivery of the website.",
         "An email service: used to send internal notifications to the ARTERRA team, such as a short summary of a new request. [[KEEP ONLY IF EMAIL ALERTS ARE TURNED ON.]]",
         "[[PAYMENT AND SHIPPING PROVIDERS, once they are used. The Terms say ARTERRA may use them.]]",
-        "Google Fonts: your browser loads the site's fonts from Google, which means Google receives your IP address and browser details.",
+        
         "WhatsApp and Pinterest: if you use a share button, you are taken to that service, which has its own privacy policy.",
         "[[OWNER AND LAWYER: state where the data is stored (the Supabase project region) and how transfers outside the user's country are handled.]]",
       ],
