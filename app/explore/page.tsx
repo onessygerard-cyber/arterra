@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import FadeImage from '@/components/FadeImage';
-import Avatar from '@/components/Avatar';
+import ArtistPortrait from '@/components/ArtistPortrait';
 import AvailabilityMark from '@/components/AvailabilityMark';
-import { masonryItemRef, ratioStyle } from '@/lib/masonry';
 import PillSelect from '@/components/PillSelect';
 import { pillClass } from '@/lib/pill';
+import { masonryItemRef, ratioStyle } from '@/lib/masonry';
 
 type Artist = {
   id: string; name: string; location: string; mediums: string[]; styles: string[];
@@ -15,8 +15,9 @@ type Artist = {
 };
 type Artwork = {
   id: string; title: string; listing_type: string; medium: string | null; style: string | null;
-  price: string; price_on_request: boolean | null; image_url: string; image_width: number | null; image_height: number | null; artist_id: string;
-  status: string; artists: { name: string } | null;
+  price: string; price_on_request: boolean | null; image_url: string;
+  image_width: number | null; image_height: number | null;
+  artist_id: string; status: string; artists: { name: string } | null;
 };
 type View = 'artists' | 'all' | 'original' | 'print';
 type Sort = 'newest' | 'price-low' | 'price-high';
@@ -86,23 +87,33 @@ export default function ExplorePage() {
   const [artists, setArtists] = useState<Artist[]>([]);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [view, setView] = useState<View>('artists');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<Sort>('newest');
   const [priceRange, setPriceRange] = useState<PriceRange>('all');
   const [mediumFilter, setMediumFilter] = useState('');
   const [styleFilter, setStyleFilter] = useState('');
+  const [availableOnly, setAvailableOnly] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
-  useEffect(() => {
-    async function load() {
+  async function load() {
+    setLoading(true);
+    setLoadError(false);
+    try {
       const res = await fetch('/api/explore-data');
+      if (!res.ok) throw new Error('failed');
       const data = await res.json();
       setArtists(data.artists || []);
       setArtworks(data.artworks || []);
-      setLoading(false);
+    } catch {
+      setLoadError(true);
     }
+    setLoading(false);
+  }
+
+  useEffect(() => {
     load();
     setFavorites(getFavorites());
 
@@ -125,6 +136,7 @@ export default function ExplorePage() {
     setQuery('');
     setPriceRange('all');
     setShowFavoritesOnly(false);
+    setAvailableOnly(false);
     setMediumFilter('');
     setStyleFilter('');
   }
@@ -169,6 +181,7 @@ export default function ExplorePage() {
       return entry ? mediumHas(a.medium, entry[1]) : true;
     })
     .filter(a => !styleFilter || (a.style || '').trim().toLowerCase() === styleFilter.toLowerCase())
+    .filter(a => !availableOnly || a.status === 'approved')
     .filter(a => !showFavoritesOnly || favorites.includes(a.id))
     .sort((a, b) => {
       if (sort === 'newest') return 0;
@@ -192,11 +205,21 @@ export default function ExplorePage() {
             <div key={i} className="h-11 w-24 bg-sand rounded-full motion-safe:animate-pulse" />
           ))}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {[0, 1].map(i => (
-            <div key={i} className="h-44 bg-sand rounded-xl motion-safe:animate-pulse" />
+        <div className="grid grid-cols-2 gap-x-6 md:grid-cols-3">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="aspect-[3/4] rounded-t-full bg-sand motion-safe:animate-pulse" />
           ))}
         </div>
+      </main>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <main className="max-w-4xl mx-auto mt-16 px-6 pb-20">
+        <h1 className="text-2xl mb-3">Explore Artists</h1>
+        <p className="text-ink-soft mb-5">We couldn&apos;t load the gallery. Check your connection and try again.</p>
+        <button onClick={load} className={pillClass(false)}>Try again</button>
       </main>
     );
   }
@@ -235,31 +258,39 @@ export default function ExplorePage() {
               ? <EmptyState message="No artists yet. Applications are reviewed by hand." />
               : <EmptyState message="No artists match your search." onReset={resetFilters} />
           )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {filteredArtists.map(a => (
-              <Link key={a.id} href={`/artist/${a.id}`}
-                className="block bg-card border border-line rounded-xl p-6 shadow-sm hover:border-blue/40">
-                <div className="flex items-center gap-3 mb-3">
-                  <Avatar name={a.name} src={a.photo_url} size={48} />
-                  <div className="min-w-0">
-                    <h3 className="font-display text-lg leading-tight">{a.name}</h3>
-                    <p className="text-sm text-ink-soft">{a.location}</p>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {a.mediums?.map(m => (
-                    <span key={m} className="text-xs bg-blue/10 text-blue-deep px-2.5 py-1 rounded-full font-medium">{m}</span>
-                  ))}
-                </div>
-                <p className="text-sm text-ink-soft mb-4">{a.bio}</p>
-                <p className="text-sm font-mono">From {a.price_range}</p>
-              </Link>
-            ))}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3">
+            {filteredArtists.map(a => {
+              const line =
+                (a.bio || '').trim() ||
+                (a.mediums && a.mediums.length > 0 ? `Works in ${a.mediums.join(', ').toLowerCase()}.` : '');
+              return (
+                <Link key={a.id} href={`/artist/${a.id}`} className="group block">
+                  <ArtistPortrait
+                    name={a.name}
+                    src={a.photo_url}
+                    lazy
+                    decorative
+                    className="w-full motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out motion-safe:group-hover:-translate-y-1"
+                  />
+                  <h3 className="mt-4 font-display text-xl leading-snug">{a.name}</h3>
+                  {a.location && <p className="mt-0.5 font-mono text-xs text-ink-soft">{a.location}</p>}
+                  {a.mediums && a.mediums.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {a.mediums.slice(0, 3).map(m => (
+                        <span key={m} className="text-xs bg-blue/10 text-blue-deep px-2.5 py-1 rounded-full font-medium">{m}</span>
+                      ))}
+                    </div>
+                  )}
+                  {line && <p className="mt-3 line-clamp-3 text-sm text-ink-soft">{line}</p>}
+                  {a.price_range && <p className="mt-3 font-mono text-xs">From {a.price_range}</p>}
+                </Link>
+              );
+            })}
           </div>
         </>
       ) : (
         <>
-          <div className="flex gap-2 mb-8 flex-wrap">
+          <div className="flex gap-2 mb-4 flex-wrap">
             <PillSelect label="Sort" value={sort} onChange={v => setSort(v as Sort)}>
               <option value="newest">Newest first</option>
               <option value="price-low">Price: Low to High</option>
@@ -283,11 +314,19 @@ export default function ExplorePage() {
                 {styleOptions.map(s => <option key={s} value={s}>{s}</option>)}
               </PillSelect>
             )}
+            <button onClick={() => setAvailableOnly(!availableOnly)}
+              aria-pressed={availableOnly} className={pillClass(availableOnly)}>
+              Available only
+            </button>
             <button onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
               aria-pressed={showFavoritesOnly} className={pillClass(showFavoritesOnly)}>
               ♥ Saved ({favorites.length})
             </button>
           </div>
+
+          <p className="mb-8 font-mono text-xs text-ink-soft" aria-live="polite">
+            {filteredArtworks.length} {filteredArtworks.length === 1 ? 'piece' : 'pieces'}
+          </p>
 
           {filteredArtworks.length === 0 && (
             artworks.length === 0

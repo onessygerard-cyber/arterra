@@ -14,11 +14,18 @@ export default function ArtistPortrait({
   name,
   src,
   className = '',
+  lazy = false,
+  decorative = false,
 }: {
   name: string;
   src?: string | null;
   className?: string;
+  lazy?: boolean;
+  decorative?: boolean;
 }) {
+  const alt = decorative ? '' : `Portrait of ${name}`;
+  const loading = lazy ? 'lazy' : 'eager';
+
   return (
     <div
       className={`relative aspect-[3/4] overflow-hidden rounded-t-full border border-line bg-sand ${className}`}
@@ -27,16 +34,17 @@ export default function ArtistPortrait({
         canOptimize(src) ? (
           <Image
             src={src}
-            alt={`Portrait of ${name}`}
+            alt={alt}
             fill
             sizes="(min-width: 768px) 280px, 192px"
-            loading="eager"
+            loading={loading}
             className="object-cover"
           />
         ) : (
           <img
             src={src}
-            alt={`Portrait of ${name}`}
+            alt={alt}
+            loading={loading}
             className="absolute inset-0 h-full w-full object-cover"
           />
         )
